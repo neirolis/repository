@@ -33,7 +33,7 @@ devices:
     desc: Device description 
     addr: 127.0.0.1:9999
     method: POST
-    body: {"test": true}
+    body: '{"test": true}'
     json: true
     duration: 10
 
