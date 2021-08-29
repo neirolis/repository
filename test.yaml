@@ -29,6 +29,15 @@ detectors:
     addrs: [127.0.0.1:64400]
 
 devices:
+  - name: test-device
+    desc: Device description 
+    addr: 127.0.0.1:9999
+    method: POST
+    body: {"test": true}
+    json: true
+    duration: 10
+
+notify:
   - name: test
     desc: Test notification to the Telegram
     type: telegram
