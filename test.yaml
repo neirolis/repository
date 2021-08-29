@@ -11,7 +11,7 @@ exec:
 scripts:
   - name: test-debug
     source: |
-      function(frame) {
+      function main(frame) {
         rtmip.Debug(frame.ID)
       }
 
