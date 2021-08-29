@@ -1,10 +1,18 @@
 name: test
-version: v0.9.0
+desc: Package for testing
+version: v0.9.1
 
 source: http://89.223.71.219/test/test_v0.9.0.zip
 md5sum: 326280d38991dcbf034f5b25f6b4fdd3
 
 exec: 
   - cp $PKGDIR/test.txt $WD/test.txt
+
+scripts:
+  - name: test-debug
+    source: |
+      function(frame) {
+        rtmip.Debug(frame.ID)
+      }
 
 need_restart: false
