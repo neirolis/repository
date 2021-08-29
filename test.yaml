@@ -14,5 +14,35 @@ scripts:
       function main(frame) {
         rtmip.Debug(frame.ID)
       }
+  - name: test2
+    source: |
+      function main(frame) {
+        for (var i in frame.Items) {
+          var item = frame.Items[i]
+          item.Name = "from-test-script"
+        }
+      }
+
+detectors:
+  - name: dummy
+    type: items
+    addrs: [127.0.0.1:64400]
+
+devices:
+  - name: test
+    desc: Test notification to the Telegram
+    type: telegram
+    subject: Hello!
+
+charts:
+  - name: test-chart
+    type: bar
+    duration: 3600
+    interval: 600
+    rate: 300
+    cast: max
+    legend: true
+    types: [person]
+    
 
 need_restart: false
