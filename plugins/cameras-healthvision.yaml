@@ -1,0 +1,12 @@
+type: plugins
+name: cameras-healthvision
+desc: Healthvision thermal camera client
+version: v1.0.0
+
+source: https://rtmip.info/plugins/cameras-healthvision_v1.0.0.zip
+md5sum: e1755758dc510e7c93ad7fcbb03e236e
+
+exec:
+  - cp -f $PKGDIR/cameras-healthvision.so $WD/plugins/
+
+need_restart: true
