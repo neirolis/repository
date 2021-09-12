@@ -1,9 +1,9 @@
 name: rtmip
 type: rtmip
-version: v4.41.7
+version: v4.41.8
 
 source: https://rtmip.info/rtmip/rtmip_v4.41.7.zip
-md5sum: d44db4b65b06e538b0206ec343a36266
+md5sum: 2530317a9c70fff52f73cc2e99b7df3d
 
 exec: 
   - cp -f $PKGDIR/rtmip $WD/rtmip
