@@ -3,7 +3,7 @@ type: rtmip
 version: v4.41.10
 
 source: https://rtmip.info/rtmip/rtmip_v4.41.7.zip
-md5sum: ec9d4053efc9658df103ae191c6f3a68
+md5sum: c5674ed3f653dc5a6c13b58ff7c800b5
 
 exec: 
   - cp -f $PKGDIR/rtmip $WD/rtmip
