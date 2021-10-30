@@ -3,7 +3,7 @@ type: rtmip
 desc: RTMIP version 4.41.1
 version: v4.42.1
 
-source: http://89.223.71.219/rtmip/rtmip_v4.42.1.zip
+source: https://rtmip.info/rtmip/rtmip_v4.42.1.zip
 md5sum: 1d804c7707327821d71803860bb3984b
 
 exec: 
