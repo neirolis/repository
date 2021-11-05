@@ -1,6 +1,6 @@
 name: rtmip
 type: rtmip
-desc: RTMIP version 4.41.1
+desc: RTMIP main package
 version: v4.42.3
 
 source: http://89.223.71.219/rtmip/rtmip_v4.42.3.zip
