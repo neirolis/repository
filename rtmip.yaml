@@ -3,7 +3,7 @@ type: rtmip
 desc: RTMIP main package
 version: v4.42.6
 
-source: http://rtmip.info/rtmip/rtmip_v4.42.6.zip
+source: https://rtmip.info/rtmip/rtmip_v4.42.6.zip
 md5sum: bdbcad6d12b1763f6036107053827e59
 
 exec: 
