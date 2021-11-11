@@ -4,7 +4,7 @@ desc: Healthvision thermal camera client
 version: v1.0.0
 
 source: https://rtmip.info/plugins/cameras-healthvision_v1.0.0.zip
-md5sum: f0d85c15ea9bc30189a3d2fe6d6fd827
+md5sum: f773f70adc8ae1bf5e7896f45e3aeed0
 
 exec:
   - cp -f $PKGDIR/cameras-healthvision.so $WD/plugins/
