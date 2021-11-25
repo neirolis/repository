@@ -1,0 +1,11 @@
+type: plugins
+name: cameras-ftp
+desc: Camera receiving frames via FTP protocol
+version: v1.0.0
+
+source: https://rtmip.info/plugins/cameras-ftp_v1.0.0.zip
+
+exec:
+  - cp -f $PKGDIR/cameras-ftp.so $WD/plugins/
+
+need_restart: true
