@@ -1,0 +1,256 @@
+type: ""
+name: people_counting
+version: v0.0.1
+scripts:
+    - uuid: c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+      name: filter_by_size
+      source: |-
+        function main(frame) {
+        	var items = []
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i];
+        		// if (item.BBox.W() < 0.03) continue;
+        		// rtmip.Debug(item.BBox.H())
+        		if (item.BBox.H() > 0.5 || item.BBox.W() > 0.5) continue;
+
+        		items.push(item);
+        	}
+
+        	frame.Items = items;
+
+        	return true;
+        }
+    - uuid: 60ab0515-01d6-472f-a480-d71702f1a886
+      name: '!count_people'
+      source: |-
+        function main(frame) {
+          // rtmip.Debug(frame.Items.length)
+          var counter = 0
+          for (var i in frame.Items) {
+          		var item = frame.Items[i]
+          		if (item.Type == "person") {
+        		  counter += 1;
+        		}
+          }
+          frame.AddTextBox("Camera: " + frame.Camera.Name + "\nPeople count: " + counter, 0.4, 0.8)
+          return true
+        }
+detectors:
+    - uuid: 6aa677b6-0e1e-4667-a47b-bbf59cb4ee59
+      name: objects
+      type: items
+      addrs:
+        - 127.0.0.1:65329
+      status:
+        version: "1.0"
+        name: objects_detector_pt
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - bicycle
+                - car
+                - motorbike
+                - aeroplane
+                - bus
+                - train
+                - truck
+                - boat
+                - traffic light
+                - fire hydrant
+                - stop sign
+                - parking meter
+                - bench
+                - bird
+                - cat
+                - dog
+                - horse
+                - sheep
+                - cow
+                - elephant
+                - bear
+                - zebra
+                - giraffe
+                - backpack
+                - umbrella
+                - handbag
+                - tie
+                - suitcase
+                - frisbee
+                - skis
+                - snowboard
+                - sports ball
+                - kite
+                - baseball bat
+                - baseball glove
+                - skateboard
+                - surfboard
+                - tennis racket
+                - bottle
+                - wine glass
+                - cup
+                - fork
+                - knife
+                - spoon
+                - bowl
+                - banana
+                - apple
+                - sandwich
+                - orange
+                - broccoli
+                - carrot
+                - hot dog
+                - pizza
+                - donut
+                - cake
+                - chair
+                - sofa
+                - pottedplant
+                - bed
+                - diningtable
+                - toilet
+                - tvmonitor
+                - laptop
+                - mouse
+                - remote
+                - keyboard
+                - cell phone
+                - microwave
+                - oven
+                - toaster
+                - sink
+                - refrigerator
+                - book
+                - clock
+                - vase
+                - scissors
+                - teddy bear
+                - hair drier
+                - toothbrush
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      params:
+        InputTypes: ""
+      cmd: ""
+analytics:
+    - uuid: 95a1fc8a-c08a-4bd5-ae27-1e3d2ea406bc
+      name: '!People counting'
+      desc: People counting on a frame / in a zone. Set region to count in a zone or leave region empty to count on a frame.
+      framerate: 10
+      passhash: []
+      links:
+        detector-aUJPGli0p:
+            "true":
+                - filter-NoV6D2BTW
+            "false": []
+        filter-NoV6D2BTW:
+            "true":
+                - tracking-arYM-z1Br
+            "false": []
+        region-xipMANBcm:
+            "true":
+                - script-nd69S9yqr
+            "false":
+                - script-nd69S9yqr
+        script-66QBWdABp:
+            "true":
+                - region-xipMANBcm
+            "false": []
+        script-nd69S9yqr:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-aUJPGli0p
+            "false": []
+        tracking-arYM-z1Br:
+            "true":
+                - script-66QBWdABp
+            "false": []
+      blocks:
+        detector-aUJPGli0p:
+            id: detector-aUJPGli0p
+            type: detector
+            data:
+                id: 2
+                type: detector
+            position:
+                x: 220
+                "y": 100
+            uuid:
+                - 6aa677b6-0e1e-4667-a47b-bbf59cb4ee59
+        filter-NoV6D2BTW:
+            id: filter-NoV6D2BTW
+            type: filter
+            data:
+                percentprob: "50"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 430
+                "y": 100
+        region-xipMANBcm:
+            id: region-xipMANBcm
+            type: region
+            data:
+                anchor: 5
+                regionnames:
+                    - enter_zone
+                type: region
+            position:
+                x: 1070
+                "y": 100
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1540
+                "y": 100
+        script-66QBWdABp:
+            id: script-66QBWdABp
+            type: script
+            data:
+                id: 97
+                type: script
+            position:
+                x: 850
+                "y": 100
+            uuid:
+                - c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+        script-nd69S9yqr:
+            id: script-nd69S9yqr
+            type: script
+            data:
+                id: 104
+                type: script
+            position:
+                x: 1300
+                "y": 99
+            uuid:
+                - 60ab0515-01d6-472f-a480-d71702f1a886
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: 0
+                "y": 100
+        tracking-arYM-z1Br:
+            id: tracking-arYM-z1Br
+            type: tracking
+            data:
+                scale: 2
+                type: tracking
+            position:
+                x: 640
+                "y": 100
