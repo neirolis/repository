@@ -1,0 +1,7 @@
+{
+	"name": "trackerIOU",
+	"desc": "tracker for objects",
+	"exec": "./IOUtracker",
+	"lang": "golang",
+	"edit": true
+}
