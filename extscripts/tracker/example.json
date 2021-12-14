@@ -1,1 +1,0 @@
-{ "camera": {"id": 1,"name": "cameraname"},"items": [{"id":"notvalidid","type":"person","prob": 0.8,"bbox": [45,123,64,57]},{"id":"notvalidid","type":"person","prob": 0.8,"bbox": [45,123,64,57]},{"id":"notvalidid","type":"person","prob": 0.8,"bbox": [45,123,64,57]},{"id":"notvalidid","type":"person","prob": 0.8,"bbox": [45,123,64,57]}]}
