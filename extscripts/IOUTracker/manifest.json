@@ -1,0 +1,12 @@
+{
+	"name": "SORT",
+	"desc": "tracker for objects",
+	"icon": "stopwatch.png",
+	"exec": "./IOU",
+	"lang": "golang",
+	"edit": true,
+	"variables": [
+		{"name":"maxlost", "default":2, "label":"Max lost detections"},
+		{"name":"ioutr", "default":0.3, "label":"IOU threshold"}
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"name": "SORT",
+	"desc": "tracker for objects",
+	"icon": "stopwatch.png",
+	"exec": "./IOUtracker",
+	"lang": "golang",
+	"edit": true,
+	"variables": [
+		{"name":"maxpred", "default":3, "label":"Max predicts without update"},
+		{"name":"minupd", "default":2, "label":"Min updates use prediction"},
+		{"name":"ioutr", "default":0.4, "label":"IOU threshold"}
+	]
+}
