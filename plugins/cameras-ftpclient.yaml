@@ -1,0 +1,11 @@
+type: plugins
+name: cameras-ftpclient
+desc: Camera load frames from remote FTP server
+version: v1.0.0
+
+source: https://rtmip.info/plugins/cameras-ftpclient_v1.0.0.zip
+
+exec:
+  - cp -f $PKGDIR/cameras-ftpclient.so $WD/plugins/
+
+need_restart: true
