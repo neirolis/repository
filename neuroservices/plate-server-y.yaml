@@ -1,0 +1,16 @@
+name: plate-server-y
+desc: HTTP Neural Network Service plate-server-y
+version: 1.0
+source: http://ds.ikorsakov.com:25000/plate-server-y.tar.gz
+exec:
+  - mv plate-server-y.tar.gz /srv/nn_services
+  - mkdir /srv/nn_services/
+  - tar -xzvf /srv/nn_services/plate-server-y.tar.gz
+  - cp /srv/nn_services/plate-server-y/plate-server-y.service /etc/systemd/system/
+  - systemctl daemon-reload
+  - systemctl start plate-server-y
+detectors:
+  - name: plate-server-y
+    type: items
+    addrs: [127.0.0.1:64301]
+need_restart: false
