@@ -1,0 +1,16 @@
+name: fire-detector-torch
+desc: HTTP Neural Network Service fire-detector-torch
+version: 1.2
+source: http://ds.ikorsakov.com:25000/fire-detector-torch.tar.gz
+exec:
+  - mv fire-detector-torch.tar.gz /srv/nn_services
+  - mkdir /srv/nn_services/
+  - tar -xzvf /srv/nn_services/fire-detector-torch.tar.gz
+  - cp /srv/nn_services/fire-detector-torch/fire-detector-torch.service /etc/systemd/system/
+  - systemctl daemon-reload
+  - systemctl start fire-detector-torch
+detectors:
+  - name: fire-detector-torch
+    type: items
+    addrs: [127.0.0.1:65347]
+need_restart: false
