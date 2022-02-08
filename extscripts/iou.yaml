@@ -1,0 +1,11 @@
+name: IOU
+desc: tracking by IOU
+version: v1.0.0
+
+source: https://github.com/MASLINQUE/IOU/releases/download/v1.0.0/IOU.zip
+
+exec: 
+  - mkdir -p $WD/extscripts/iou
+  - cp -r $PKGDIR/IOU $WD/extscripts/iou
+  
+need_restart: true
