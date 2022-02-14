@@ -1,0 +1,11 @@
+name: Expand Bboxes
+desc: Expand bbox sizes
+version: v1.0.0
+
+source: https://github.com/MASLINQUE/expand_bboxes/releases/download/v1.0.0/expand_bbox.zip
+
+exec: 
+  - cp -r $PKGDIR/* $WD/extscripts/
+  
+need_restart: true
+
