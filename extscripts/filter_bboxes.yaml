@@ -1,0 +1,12 @@
+name: Filter Bboxes
+desc: Filter bboxes by sizes
+version: v1.0.0
+
+source: https://github.com/MASLINQUE/filter_bboxes/releases/download/v1.0.0/filter_bbox.zip
+
+exec: 
+  - mkdir -p $WD/extscripts/filter_bbox
+  - cp -r $PKGDIR/filter_bbox $WD/extscripts/filter_bbox
+  
+need_restart: true
+
