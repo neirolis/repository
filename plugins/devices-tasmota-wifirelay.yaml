@@ -1,0 +1,11 @@
+type: plugins
+name: devices-tasmota-wifirelay
+desc: Tasmota WiFi relay
+version: v1.0.0
+
+source: https://rtmip.info/plugins/devices-tasmota-wifirelay_v1.0.0.zip
+
+exec:
+  - cp -f $PKGDIR/devices-tasmota-wifirelay.so $WD/plugins/
+
+need_restart: true
