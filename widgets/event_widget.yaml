@@ -1,0 +1,11 @@
+name: Event widget
+desc: Making event by button
+version: v1.0.0
+
+source: https://github.com/MASLINQUE/event_widget/releases/download/1.0.0/event_widget.zip
+
+exec: 
+  - mkdir -p $WD/widgets
+  - cp -r $PKGDIR/* $WD/widgets/
+  
+need_restart: false
