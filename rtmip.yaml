@@ -4,7 +4,7 @@ desc: RTMIP main package
 version: v4.47.4
 
 source: https://rtmip.info/rtmip/rtmip_v4.47.4.zip
-md5sum: 850deefe3b6932959d50e142477ccdf9
+md5sum: a0ef2b85805eae55f5ea7a175d646add
 
 exec: 
   - cp -f $PKGDIR/rtmip $WD/rtmip
