@@ -4,7 +4,7 @@ version: 1.4
 source: http://ds.ikorsakov.com:25000/person-head-detector-torch.tar.gz
 auth: basic
 exec:
-  - mkdir /srv/nn_services/
+  - mkdir -p /srv/nn_services/
   - mv person-head-detector-torch.tar.gz /srv/nn_services
   - tar -xzvf /srv/nn_services/person-head-detector-torch.tar.gz
   - cp /srv/nn_services/person-head-detector-torch/person-head-detector-torch.service /etc/systemd/system/
