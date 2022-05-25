@@ -1,0 +1,16 @@
+name: pig-detector-torch
+desc: HTTP Neural Network Service pig-detector-torch
+version: 1.4
+source: http://ds.ikorsakov.com:25000/pig-detector-torch.tar.gz
+exec:
+  - mv pig-detector-torch.tar.gz /srv/nn_services
+  - mkdir /srv/nn_services/
+  - tar -xzvf /srv/nn_services/pig-detector-torch.tar.gz
+  - cp /srv/nn_services/pig-detector-torch/pig-detector-torch.service /etc/systemd/system/
+  - systemctl daemon-reload
+  - systemctl start pig-detector-torch
+detectors:
+  - name: pig-detector-torch
+    type: items
+    addrs: [127.0.0.1:65532]
+need_restart: false
