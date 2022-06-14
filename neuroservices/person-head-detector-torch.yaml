@@ -2,13 +2,22 @@ name: person-head-detector-torch
 desc: HTTP Neural Network Service person-head-detector-torch
 version: 1.4
 source: http://ds.ikorsakov.com:25000/person-head-detector-torch.tar.gz
+auth: basic
 exec:
-  - mv person-head-detector-torch.tar.gz /srv/nn_services
-  - mkdir /srv/nn_services/
-  - tar -xzvf /srv/nn_services/person-head-detector-torch.tar.gz
+  - mkdir -p /srv/nn_services/
+  - tar -xzvf /srv/rtmip/packages/person-head-detector-torch.tar.gz
+  - mv /srv/rtmip/person-head-detector-torch/ /srv/nn_services/
+  - rm -rf /srv/rtmip/packages/person-head-detector-torch.tar.gz
   - cp /srv/nn_services/person-head-detector-torch/person-head-detector-torch.service /etc/systemd/system/
   - systemctl daemon-reload
+  - systemctl enable person-head-detector-torch
   - systemctl start person-head-detector-torch
+exec_uninstall:
+  - systemctl stop person-head-detector-torch
+  - systemctl disable person-head-detector-torch
+  - rm -rf /etc/systemd/system/person-head-detector-torch.service
+  - systemctl daemon-reload
+  - rm -rf /srv/nn_services/person-head-detector-torch
 detectors:
   - name: person-head-detector-torch
     type: items
