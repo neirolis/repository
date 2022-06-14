@@ -2,13 +2,22 @@ name: person-keypoints-torch
 desc: HTTP Neural Network Service person-keypoints-torch
 version: 1.4
 source: http://ds.ikorsakov.com:25000/person-keypoints-torch.tar.gz
+auth: basic
 exec:
-  - mv person-keypoints-torch.tar.gz /srv/nn_services
-  - mkdir /srv/nn_services/
-  - tar -xzvf /srv/nn_services/person-keypoints-torch.tar.gz
+  - mkdir -p /srv/nn_services/
+  - tar -xzvf /srv/rtmip/packages/person-keypoints-torch.tar.gz
+  - mv /srv/rtmip/person-keypoints-torch/ /srv/nn_services/
+  - rm -rf /srv/rtmip/packages/person-keypoints-torch.tar.gz
   - cp /srv/nn_services/person-keypoints-torch/person-keypoints-torch.service /etc/systemd/system/
   - systemctl daemon-reload
+  - systemctl enable person-keypoints-torch
   - systemctl start person-keypoints-torch
+exec_uninstall:
+  - systemctl stop person-keypoints-torch
+  - systemctl disable person-keypoints-torch
+  - rm -rf /etc/systemd/system/person-keypoints-torch.service
+  - systemctl daemon-reload
+  - rm -rf /srv/nn_services/person-keypoints-torch
 detectors:
   - name: person-keypoints-torch
     type: items
