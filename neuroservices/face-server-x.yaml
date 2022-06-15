@@ -8,13 +8,13 @@ exec:
   - tar -xzvf /srv/rtmip/packages/face-server-x.tar.gz
   - mv /srv/rtmip/face-server-x/ /srv/nn_services/
   - rm -rf /srv/rtmip/packages/face-server-x.tar.gz
-  - cp /srv/nn_services/face-server-x/face-server-x.service /etc/supervisor/conf.d/
+  - cp /srv/nn_services/face-server-x/face-server-x.conf /etc/supervisor/conf.d/
   - supervisorctl reread
   - supervisorctl update
   - supervisorctl start face-server-x
 exec_uninstall:
   - supervisorctl stop face-server-x
-  - rm -rf /etc/supervisor/conf.d/face-server-x.service
+  - rm -rf /etc/supervisor/conf.d/face-server-x.conf
   - supervisorctl reread
   - supervisorctl update
   - rm -rf /srv/nn_services/face-server-x
