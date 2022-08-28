@@ -12,5 +12,5 @@ exec:
 detectors:
   - name: head-classifier-tf1
     type: items
-    addrs: [127.0.0.1:65325]
+    addrs: [127.0.0.1:65789]
 need_restart: false
