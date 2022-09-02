@@ -7,6 +7,6 @@ source: https://rtmip.info/plugins/cameras-multistreams_v0.4.1.zip
 
 exec:
   - cp -f $PKGDIR/cameras-multistreams.so $WD/plugins/
-  - cp -rf $PKGDIR/multistream $WD/pages/
+  - cp -rf $PKGDIR/multistreams $WD/pages/
 
 need_restart: true
