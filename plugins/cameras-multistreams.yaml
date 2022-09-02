@@ -1,0 +1,11 @@
+type: plugins
+name: cameras-multistreams
+desc: Checking `http` video streams availability and switching cameras address on failures
+version: v0.4.1
+
+source: https://rtmip.info/plugins/cameras-multistreams_v0.4.1.zip
+
+exec:
+  - cp -f $PKGDIR/cameras-multistreams.so $WD/plugins/
+
+need_restart: true
