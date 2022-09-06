@@ -1,25 +1,25 @@
-name: person-head-detector-torch
+name: nrls_person-head-detector-torch
 desc: HTTP Neural Network Service person-head-detector-torch
 version: 1.4
 source: http://176.195.55.27:25000/person-head-detector-torch.tar.gz
 auth: basic
 exec:
-  - mkdir -p /srv/nn_services/
+  - mkdir -p /srv/nrls/
   - tar -xzvf $WD/packages/person-head-detector-torch.tar.gz
-  - mv $WD/person-head-detector-torch/ /srv/nn_services/
+  - mv $WD/person-head-detector-torch/ /srv/nrls/
   - rm -rf $WD/packages/person-head-detector-torch.tar.gz
-  - cp /srv/nn_services/person-head-detector-torch/person-head-detector-torch.service /etc/systemd/system/
+  - cp /srv/nrls/person-head-detector-torch/nrls_person-head-detector-torch.service /etc/systemd/system/
   - systemctl daemon-reload
-  - systemctl enable person-head-detector-torch
-  - systemctl start person-head-detector-torch
+  - systemctl enable nrls_person-head-detector-torch.service
+  - systemctl start nrls_person-head-detector-torch.service
 exec_uninstall:
-  - systemctl stop person-head-detector-torch
-  - systemctl disable person-head-detector-torch
-  - rm -rf /etc/systemd/system/person-head-detector-torch.service
+  - systemctl stop nrls_person-head-detector-torch.service
+  - systemctl disable nrls_person-head-detector-torch.service
+  - rm -rf /etc/systemd/system/nrls_person-head-detector-torch.service
   - systemctl daemon-reload
-  - rm -rf /srv/nn_services/person-head-detector-torch
+  - rm -rf /srv/nrls/person-head-detector-torch
 detectors:
-  - name: person-head-detector-torch
+  - name: nrls_person-head-detector-torch
     type: items
     addrs: [127.0.0.1:65530]
 need_restart: false
