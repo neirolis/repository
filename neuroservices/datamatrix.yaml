@@ -1,0 +1,25 @@
+name: nrls_datamatrix
+desc: HTTP Neural Network Service datamatrix
+version: 0.0.1-11June2022
+source: http://176.195.55.27:25000/datamatrix.tar.gz
+auth: basic
+exec:
+  - mkdir -p /srv/nrls/
+  - tar -xzvf $WD/packages/datamatrix.tar.gz
+  - mv $WD/datamatrix/ /srv/nrls/
+  - rm -rf $WD/packages/datamatrix.tar.gz
+  - cp /srv/nrls/datamatrix/nrls_datamatrix.service /etc/systemd/system/
+  - systemctl daemon-reload
+  - systemctl enable nrls_datamatrix.service
+  - systemctl start nrls_datamatrix.service
+exec_uninstall:
+  - systemctl stop nrls_datamatrix.service
+  - systemctl disable nrls_datamatrix.service
+  - rm -rf /etc/systemd/system/nrls_datamatrix.service
+  - systemctl daemon-reload
+  - rm -rf /srv/nrls/datamatrix
+detectors:
+  - name: nrls_datamatrix
+    type: items
+    addrs: [127.0.0.1:64465]
+need_restart: false
