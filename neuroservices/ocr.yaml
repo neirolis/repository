@@ -1,4 +1,4 @@
-name: ocr
+name: nrls_ocr
 desc: HTTP Neural Network Service ocr
 version: 1.0
 source: http://176.195.55.27:25000/ocr.tar.gz
@@ -19,7 +19,7 @@ exec_uninstall:
   - systemctl daemon-reload
   - rm -rf /srv/nrls/ocr
 detectors:
-  - name: ocr
+  - name: nrls_ocr
     type: items
     addrs: [127.0.0.1:65310]
 need_restart: false
