@@ -7,7 +7,7 @@ exec:
   - ./$PKGDIR/datamatrix/install_and_start.sh
 
 exec_uninstall:
-  - ./$PKGDIR/datamatrix/uninstall_and_stop.sh
+  - /srv/nrls/datamatrix/uninstall_and_stop.sh
 
 detectors:
   - name: nrls_datamatrix
