@@ -4,10 +4,10 @@ version: 1.0
 source: http://176.195.55.27:25000/ocr.tar.gz
 auth: basic
 exec:
-  - ./install_and_start.sh
+  - .//srv/nrls/ocr/install_and_start.sh
 
 exec_uninstall:
-  - ./uninstall_and_stop.sh
+  - .//srv/nrls/ocr/uninstall_and_stop.sh
 
 detectors:
   - name: nrls_ocr
