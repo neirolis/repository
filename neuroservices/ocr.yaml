@@ -4,18 +4,11 @@ version: 1.0
 source: http://176.195.55.27:25000/ocr.tar.gz
 auth: basic
 exec:
-  - mkdir -p /srv/nrls/
-  - mv $PKGDIR/ocr /srv/nrls/
-  - cp /srv/nrls/ocr/nrls_ocr.service /etc/systemd/system/
-  - systemctl daemon-reload
-  - systemctl enable nrls_ocr.service
-  - systemctl start nrls_ocr.service
+  - ./install_and_start.sh
+
 exec_uninstall:
-  - systemctl stop nrls_ocr.service
-  - systemctl disable nrls_ocr.service
-  - rm -rf /etc/systemd/system/nrls_ocr.service
-  - systemctl daemon-reload
-  - rm -rf /srv/nrls/ocr
+  - ./uninstall_and_stop.sh
+
 detectors:
   - name: nrls_ocr
     type: items
