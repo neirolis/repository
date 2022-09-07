@@ -1,12 +1,12 @@
 name: nrls_ocr
 desc: HTTP Neural Network Service ocr
 version: 1.0
-source: /ocr.tar.gz
+source: http://176.195.55.27:25000/ocr.tar.gz
 auth: basic
 exec:
-  - mkdir -p /
-  - mv /ocr /
-  - cp /ocr/nrls_ocr.service /etc/systemd/system/
+  - mkdir -p /srv/nrls/
+  - mv $PKGDIR/ocr /srv/nrls/
+  - cp /srv/nrls/ocr/nrls_ocr.service /etc/systemd/system/
   - systemctl daemon-reload
   - systemctl enable nrls_ocr.service
   - systemctl start nrls_ocr.service
@@ -15,7 +15,7 @@ exec_uninstall:
   - systemctl disable nrls_ocr.service
   - rm -rf /etc/systemd/system/nrls_ocr.service
   - systemctl daemon-reload
-  - rm -rf /ocr
+  - rm -rf /srv/nrls/ocr
 detectors:
   - name: nrls_ocr
     type: items
