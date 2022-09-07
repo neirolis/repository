@@ -4,20 +4,11 @@ version: 1.4
 source: http://176.195.55.27:25000/weapons-detector-torch.tar.gz
 auth: basic
 exec:
-  - mkdir -p /srv/nrls/
-  - tar -xzvf $WD/packages/weapons-detector-torch.tar.gz
-  - mv $WD/weapons-detector-torch/ /srv/nrls/
-  - rm -rf $WD/packages/weapons-detector-torch.tar.gz
-  - cp /srv/nrls/weapons-detector-torch/nrls_weapons-detector-torch.service /etc/systemd/system/
-  - systemctl daemon-reload
-  - systemctl enable nrls_weapons-detector-torch.service
-  - systemctl start nrls_weapons-detector-torch.service
+  - ./$PKGDIR/weapons-detector-torch/install_and_start.sh
+
 exec_uninstall:
-  - systemctl stop nrls_weapons-detector-torch.service
-  - systemctl disable nrls_weapons-detector-torch.service
-  - rm -rf /etc/systemd/system/nrls_weapons-detector-torch.service
-  - systemctl daemon-reload
-  - rm -rf /srv/nrls/weapons-detector-torch
+  - /srv/nrls/weapons-detector-torch/uninstall_and_stop.sh
+
 detectors:
   - name: nrls_weapons-detector-torch
     type: items
