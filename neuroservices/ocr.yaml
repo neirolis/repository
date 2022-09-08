@@ -12,5 +12,5 @@ exec_uninstall:
 detectors:
   - name: nrls_ocr
     type: items
-    addrs: [127.0.0.1:65310]
+    addrs: [127.0.0.1:65322]
 need_restart: false
