@@ -12,5 +12,5 @@ exec_uninstall:
 detectors:
   - name: nrls_person-keypoints-torch
     type: items
-    addrs: [127.0.0.1:65532]
+    addrs: [127.0.0.1:65538]
 need_restart: false
