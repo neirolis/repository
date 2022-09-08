@@ -1,0 +1,25 @@
+name: face-server-x
+desc: HTTP Neural Network Service face-server-x
+version: 1.0
+source: http://ds.ikorsakov.com:25000/face-server-x.tar.gz
+auth: basic
+exec:
+  - mkdir -p /srv/nn_services/
+  - tar -xzvf /srv/rtmip/packages/face-server-x.tar.gz
+  - mv /srv/rtmip/face-server-x/ /srv/nn_services/
+  - rm -rf /srv/rtmip/packages/face-server-x.tar.gz
+  - cp /srv/nn_services/face-server-x/face-server-x.conf /etc/supervisor/conf.d/
+  - supervisorctl reread
+  - supervisorctl update
+  - supervisorctl start face-server-x
+exec_uninstall:
+  - supervisorctl stop face-server-x
+  - rm -rf /etc/supervisor/conf.d/face-server-x.conf
+  - supervisorctl reread
+  - supervisorctl update
+  - rm -rf /srv/nn_services/face-server-x
+detectors:
+  - name: face-server-x
+    type: items
+    addrs: [127.0.0.1:53246]
+need_restart: false
