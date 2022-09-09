@@ -1,0 +1,16 @@
+name: nrls_car-models-classifier-tf1
+desc: HTTP Neural Network Service car-models-classifier-tf1
+version: 1.4
+source: http://176.195.55.27:25000/car-models-classifier-tf1.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/car-models-classifier-tf1/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/car-models-classifier-tf1/uninstall_and_stop.sh
+
+detectors:
+  - name: nrls_car-models-classifier-tf1
+    type: items
+    addrs: [127.0.0.1:60763]
+need_restart: false
