@@ -1,0 +1,12 @@
+type: plugins
+name: reports-peoplecounting
+desc: Counting of people report(xlsx)
+version: v0.0.2
+
+source: https://rtmip.info/plugins/cameras-multistreams_v0.0.2.zip
+
+exec:
+  - cp -f $PKGDIR/cameras-multistreams.so $WD/plugins/
+  - cp -rf $PKGDIR/multistreams $WD/pages/multistreams
+
+need_restart: true
