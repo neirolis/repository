@@ -1,6 +1,6 @@
 name: nrls_datamatrix
 desc: HTTP Neural Network Service datamatrix
-version: 0.0.1-11June2022
+version: 0.1.0b
 source: http://176.195.55.27:25000/datamatrix.tar.gz
 auth: basic
 exec:
