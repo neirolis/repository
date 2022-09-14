@@ -6,7 +6,6 @@ version: v0.0.2
 source: https://rtmip.info/plugins/cameras-multistreams_v0.0.2.zip
 
 exec:
-  - cp -f $PKGDIR/cameras-multistreams.so $WD/plugins/
-  - cp -rf $PKGDIR/multistreams $WD/pages/multistreams
+  - cp -f $PKGDIR/reports-peoplecounting.so $WD/plugins/
 
 need_restart: true
