@@ -1,0 +1,11 @@
+type: plugins
+name: reports-peoplecounting
+desc: Counting of people report(xlsx)
+version: v0.0.2
+
+source: https://rtmip.info/plugins/reports-peoplecounting_v0.0.2.zip
+
+exec:
+  - cp -f $PKGDIR/reports-peoplecounting.so $WD/plugins/
+
+need_restart: true

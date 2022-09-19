@@ -1,16 +1,16 @@
-name: head-classifier-tf1
+name: nrls_head-classifier-tf1
 desc: HTTP Neural Network Service head-classifier-tf1
 version: 1.4
-source: http://ds.ikorsakov.com:25000/head-classifier-tf1.tar.gz
+source: http://176.195.55.27:25000/head-classifier-tf1.tar.gz
+auth: basic
 exec:
-  - mv head-classifier-tf1.tar.gz /srv/nn_services
-  - mkdir /srv/nn_services/
-  - tar -xzvf /srv/nn_services/head-classifier-tf1.tar.gz
-  - cp /srv/nn_services/head-classifier-tf1/head-classifier-tf1.service /etc/systemd/system/
-  - systemctl daemon-reload
-  - systemctl start head-classifier-tf1
+  - ./$PKGDIR/head-classifier-tf1/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/head-classifier-tf1/uninstall_and_stop.sh
+
 detectors:
-  - name: head-classifier-tf1
+  - name: nrls_head-classifier-tf1
     type: items
-    addrs: [127.0.0.1:65789]
+    addrs: [127.0.0.1:65325]
 need_restart: false

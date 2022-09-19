@@ -1,16 +1,16 @@
-name: car-quality-classifier-tf1
+name: nrls_car-quality-classifier-tf1
 desc: HTTP Neural Network Service car-quality-classifier-tf1
 version: 1.4
-source: http://ds.ikorsakov.com:25000/car-quality-classifier-tf1.tar.gz
+source: http://176.195.55.27:25000/car-quality-classifier-tf1.tar.gz
+auth: basic
 exec:
-  - mv car-quality-classifier-tf1.tar.gz /srv/nn_services
-  - mkdir /srv/nn_services/
-  - tar -xzvf /srv/nn_services/car-quality-classifier-tf1.tar.gz
-  - cp /srv/nn_services/car-quality-classifier-tf1/car-quality-classifier-tf1.service /etc/systemd/system/
-  - systemctl daemon-reload
-  - systemctl start car-quality-classifier-tf1
+  - ./$PKGDIR/car-quality-classifier-tf1/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/car-quality-classifier-tf1/uninstall_and_stop.sh
+
 detectors:
-  - name: car-quality-classifier-tf1
+  - name: nrls_car-quality-classifier-tf1
     type: items
     addrs: [127.0.0.1:65329]
 need_restart: false
