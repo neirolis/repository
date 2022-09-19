@@ -2,13 +2,22 @@ name: weapons-detector-torch
 desc: HTTP Neural Network Service weapons-detector-torch
 version: 1.4
 source: http://ds.ikorsakov.com:25000/weapons-detector-torch.tar.gz
+auth: basic
 exec:
-  - mv weapons-detector-torch.tar.gz /srv/nn_services
-  - mkdir /srv/nn_services/
-  - tar -xzvf /srv/nn_services/weapons-detector-torch.tar.gz
+  - mkdir -p /srv/nn_services/
+  - tar -xzvf /srv/rtmip/packages/weapons-detector-torch.tar.gz
+  - mv /srv/rtmip/weapons-detector-torch/ /srv/nn_services/
+  - rm -rf /srv/rtmip/packages/weapons-detector-torch.tar.gz
   - cp /srv/nn_services/weapons-detector-torch/weapons-detector-torch.service /etc/systemd/system/
   - systemctl daemon-reload
+  - systemctl enable weapons-detector-torch
   - systemctl start weapons-detector-torch
+exec_uninstall:
+  - systemctl stop weapons-detector-torch
+  - systemctl disable weapons-detector-torch
+  - rm -rf /etc/systemd/system/weapons-detector-torch.service
+  - systemctl daemon-reload
+  - rm -rf /srv/nn_services/weapons-detector-torch
 detectors:
   - name: weapons-detector-torch
     type: items

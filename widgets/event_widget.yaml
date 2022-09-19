@@ -1,3 +1,4 @@
+type: widget
 name: Event widget
 desc: Making event by button
 version: v1.0.0

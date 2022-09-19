@@ -1,0 +1,11 @@
+type: plugins
+name: auth-ldap
+desc: Authorization using LDAP
+version: v1.0.0
+
+source: https://rtmip.info/plugins/auth-ldap_v1.0.0.zip
+
+exec:
+  - cp -f $PKGDIR/auth-ldap.so $WD/plugins/
+
+need_restart: true
