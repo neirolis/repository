@@ -1,8 +1,8 @@
 name: SORT
 desc: tracking by SORT...
-version: v1.0.2
+version: v1.0.0
 
-source: https://github.com/MASLINQUE/SORT/releases/download/v1.0.2/sort.zip
+source: https://github.com/MASLINQUE/sort_extscript/releases/download/1.0.0/sort_tr.zip
 
 exec: 
   - mkdir -p $WD/extscripts
