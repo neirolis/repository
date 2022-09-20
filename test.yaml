@@ -8,6 +8,9 @@ md5sum: 326280d38991dcbf034f5b25f6b4fdd3
 exec: 
   - cp $PKGDIR/test.txt $WD/test.txt
 
+exec_uninstall:
+	- rm $WD/test.txt
+
 scripts:
   - name: test-debug
     source: |
