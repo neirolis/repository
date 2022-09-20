@@ -9,7 +9,7 @@ exec:
   - cp $PKGDIR/test.txt $WD/test.txt
 
 exec_uninstall:
-	- rm $WD/test.txt
+  - rm $WD/test.txt
 
 scripts:
   - name: test-debug
