@@ -7,6 +7,4 @@ source: https://github.com/MASLINQUE/sort_extscript/releases/download/1.0.0/sort
 exec: 
   - mkdir -p $WD/extscripts
   - cp -r $PKGDIR/* $WD/extscripts/
-  
-need_restart: false
-
+  - python3 -m pip install -r /extscripts/$PKGDIR/requrequirements.txt
