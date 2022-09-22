@@ -1,0 +1,16 @@
+name: nrls_transport-detector-torch
+desc: HTTP Neural Network Service transport-detector-torch
+version: 1.4
+source: http://176.195.55.27:25000/transport-detector-torch.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/transport-detector-torch/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/transport-detector-torch/uninstall_and_stop.sh
+
+detectors:
+  - name: nrls_transport-detector-torch
+    type: items
+    addrs: [127.0.0.1:65540]
+need_restart: false

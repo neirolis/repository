@@ -1,25 +1,16 @@
-name: weapons-detector-torch
+name: nrls_weapons-detector-torch
 desc: HTTP Neural Network Service weapons-detector-torch
 version: 1.4
-source: http://ds.ikorsakov.com:25000/weapons-detector-torch.tar.gz
+source: http://176.195.55.27:25000/weapons-detector-torch.tar.gz
 auth: basic
 exec:
-  - mkdir -p /srv/nn_services/
-  - tar -xzvf /srv/rtmip/packages/weapons-detector-torch.tar.gz
-  - mv /srv/rtmip/weapons-detector-torch/ /srv/nn_services/
-  - rm -rf /srv/rtmip/packages/weapons-detector-torch.tar.gz
-  - cp /srv/nn_services/weapons-detector-torch/weapons-detector-torch.service /etc/systemd/system/
-  - systemctl daemon-reload
-  - systemctl enable weapons-detector-torch
-  - systemctl start weapons-detector-torch
+  - ./$PKGDIR/weapons-detector-torch/install_and_start.sh
+
 exec_uninstall:
-  - systemctl stop weapons-detector-torch
-  - systemctl disable weapons-detector-torch
-  - rm -rf /etc/systemd/system/weapons-detector-torch.service
-  - systemctl daemon-reload
-  - rm -rf /srv/nn_services/weapons-detector-torch
+  - /srv/nrls/weapons-detector-torch/uninstall_and_stop.sh
+
 detectors:
-  - name: weapons-detector-torch
+  - name: nrls_weapons-detector-torch
     type: items
     addrs: [127.0.0.1:65531]
 need_restart: false
