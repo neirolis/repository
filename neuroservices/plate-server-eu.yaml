@@ -1,0 +1,16 @@
+name: nrls_plate-server-eu
+desc: HTTP Neural Network Service plate-server-eu
+version: 1.0
+source: http://176.195.55.27:25000/plate-server-eu.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/plate-server-eu/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/plate-server-eu/uninstall_and_stop.sh
+
+detectors:
+  - name: nrls_plate-server-eu
+    type: items
+    addrs: [127.0.0.1:64302]
+need_restart: false
