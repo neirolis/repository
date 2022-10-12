@@ -1,0 +1,16 @@
+name: nrls_containers-numbers-recognizer
+desc: HTTP Neural Network Service containers-numbers-recognizer
+version: 1.0
+source: http://176.195.55.27:25000/containers-numbers-recognizer.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/containers-numbers-recognizer/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/containers-numbers-recognizer/uninstall_and_stop.sh
+
+detectors:
+  - name: nrls_containers-numbers-recognizer
+    type: items
+    addrs: [127.0.0.1:3333]
+need_restart: false
