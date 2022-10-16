@@ -1,9 +1,9 @@
 type: plugins
 name: reports-famadesa
 desc: Counting of pigs report(xlsx)
-version: v0.0.1
+version: v0.1.0
 
-source: https://rtmip.info/plugins/reports-famadesa_v0.0.1.zip
+source: https://rtmip.info/plugins/reports-famadesa_v0.1.0.zip
 
 exec:
   - cp -f $PKGDIR/reports-peoplecounting.so $WD/plugins/
