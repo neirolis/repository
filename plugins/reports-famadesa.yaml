@@ -6,6 +6,6 @@ version: v0.1.0
 source: https://rtmip.info/plugins/reports-famadesa_v0.1.0.zip
 
 exec:
-  - cp -f $PKGDIR/reports-peoplecounting.so $WD/plugins/
+  - cp -f $PKGDIR/reports-famadesa.so $WD/plugins/
 
 need_restart: true
