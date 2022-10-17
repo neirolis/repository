@@ -3,7 +3,7 @@ type: rtmip
 desc: RTMIP main package
 version: v5.8.5-8
 
-source: https://rtmip.info/rtmip/rtmip_.zip
+source: https://rtmip.info/rtmip/rtmip_v5.8.5-8.zip
 md5sum: 6a8bc5f5a644349760b7df76572cf608
 
 exec: 
