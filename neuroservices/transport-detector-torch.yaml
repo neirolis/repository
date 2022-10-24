@@ -12,5 +12,5 @@ exec_uninstall:
 detectors:
   - name: nrls_transport-detector-torch
     type: items
-    addrs: [127.0.0.1:65540]
+    addrs: [127.0.0.1:62341]
 need_restart: false
