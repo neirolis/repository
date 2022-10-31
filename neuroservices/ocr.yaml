@@ -1,7 +1,7 @@
 name: nrls_ocr
 desc: HTTP Neural Network Service ocr
 version: 1.0
-source: http://176.195.55.27:25000/ocr.tar.gz
+source: http://93.90.41.132:25000/ocr.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/ocr/install_and_start.sh

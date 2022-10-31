@@ -1,7 +1,7 @@
 name: nrls_plate-server
 desc: HTTP Neural Network Service plate-server
 version: 1.0
-source: http://176.195.55.27:25000/plate-server.tar.gz
+source: http://93.90.41.132:25000/plate-server.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/plate-server/install_and_start.sh
