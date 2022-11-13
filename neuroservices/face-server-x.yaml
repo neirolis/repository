@@ -1,7 +1,7 @@
 name: nrls_face-server-x
 desc: HTTP Neural Network Service face-server-x
 version: 1.0
-source: http://93.90.41.132:25000/face-server-x.tar.gz
+source: http://176.195.55.27:25000/face-server-x.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/face-server-x/install_and_start.sh
