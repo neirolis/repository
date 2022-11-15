@@ -1,0 +1,143 @@
+type: ""
+name: cashier_away_2
+version: v0.0.1
+scripts:
+    - uuid: c8a00de7-f666-4a1e-960a-ce001cca09c0
+      name: cashier_away
+      enabled: false
+      source: "// script created at 12:18:16 июнь 15\nCASHIER_CACHE = {'firstDetect': 0, 'lastDetect': 9999999}\nreportDelay = 5\n\nfunction main(frame) {\n  var date = new Date(frame.Time * 1000)\n  var hours = date.getHours()\n  \n  if ( (hours < 10) || (hours >= 13) ) {\n    return true\n  }\n  \n\tvar counter = 0\n\tvar needReport = false\n\t\n\tvar personFound = false\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tif (item.Type == \"person\") {\n\t\t  personFound = true\n\t\t}\n\t}\n\t\n\tif (personFound == false) {\n\t  if (frame.Time - CASHIER_CACHE['firstDetect'] > 60) {\n\t    rtmip.Debug('fail')\n\t    frame.State = \"fail\"\n\t\t  frame.Status = \"Кассир не на месте\"\n\t\t  \n\t\t  var newitem = rtmip.NewItem(\"empty-cache\", [])\n\t\t  frame.Items = [newitem]\n\t\t  \n\t\t  return false\n\t  }\n\t} else {\n\t  rtmip.Debug('not fail')\n\t  CASHIER_CACHE['firstDetect'] = frame.Time\n\t}\n\t\n\trtmip.Debug(CASHIER_CACHE)\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tif (item.Type == \"person\") {\n\t\t  item.State = \"pass\"\n\t\t  counter ++\n\t\t}\n\t}\n\t\n// \tif (counter == 0) {\n// \t  frame.State = \"fail\"\n// \t\tframe.Status = \"Кассир не на месте\"\n// \t\t// frame.Status = \"El cajero esta ausente\"\n// \t}\n\t\n\treturn true\n}"
+detectors:
+    - uuid: bba092e8-20b6-4e3a-8f90-63499bccff0d
+      name: persons
+      desc: original person detector 65530
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+analytics:
+    - uuid: a65421a9-f294-4221-ba9e-76c40b2af248
+      name: Cashier_away
+      enabled: true
+      framerate: 5
+      passhash: []
+      links:
+        detector-8EYG6Pc26:
+            "true":
+                - filter-c8dFV1EAC
+            "false": []
+        filter-c8dFV1EAC:
+            "true":
+                - region-KzNGmyVYR
+            "false": []
+        region-KzNGmyVYR:
+            "true":
+                - script-_ytVQidwi
+            "false":
+                - script-_ytVQidwi
+        script-_ytVQidwi:
+            "true":
+                - result
+            "false":
+                - result
+                - event-VCa338FC5
+        source:
+            "true":
+                - detector-8EYG6Pc26
+            "false": []
+      blocks:
+        detector-8EYG6Pc26:
+            id: detector-8EYG6Pc26
+            type: detector
+            data:
+                id: 2
+                type: detector
+            position:
+                x: -80
+                "y": 100
+            uuid:
+                - bba092e8-20b6-4e3a-8f90-63499bccff0d
+            active: true
+        event-VCa338FC5:
+            id: event-VCa338FC5
+            type: event
+            data:
+                interval: "30"
+                saveframe: true
+                type: event
+            position:
+                x: 940
+                "y": 280
+            active: true
+        filter-c8dFV1EAC:
+            id: filter-c8dFV1EAC
+            type: filter
+            data:
+                percentprob: "20"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 140
+                "y": 100
+            active: true
+        region-KzNGmyVYR:
+            id: region-KzNGmyVYR
+            type: region
+            data:
+                anchor: 5
+                regionnames:
+                    - cashier_away
+                type: region
+            position:
+                x: 350
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 970
+                "y": 100
+            active: true
+        script-_ytVQidwi:
+            id: script-_ytVQidwi
+            type: script
+            data:
+                id: 5
+                type: script
+            position:
+                x: 580
+                "y": 100
+            uuid:
+                - c8a00de7-f666-4a1e-960a-ce001cca09c0
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -310
+                "y": 100
+            active: true

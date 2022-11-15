@@ -1,0 +1,140 @@
+type: ""
+name: car_entrance_check
+version: v0.0.1
+scripts:
+    - uuid: 0ff58f11-11ad-4a45-bb29-ba210e62f7b2
+      name: car_entrance_check
+      enabled: false
+      source: "function main(frame) {\n\tvar carCounter = 0\n\tvar personCounter = 0\n\tfor (var i in frame.Items) {\n\t  \n\t\tvar item = frame.Items[i]\n\t\tif (item.Type == \"car\") {\n\t\t  // item.State = \"pass\"\n\t\t  carCounter ++\n\t\t}\n\t\tif (item.Type == \"person\") {\n\t\t  // item.State = \"pass\"\n\t\t  personCounter ++\n\t\t}\n\t}\n\t\n\tif (carCounter > 0) {\n\t  frame.AddTextBox(\"Автомобиль в зоне проверки\", 0.35, 0.1)\n\t // frame.State = \"fail\"\n\t\t// // frame.Status = \"Человек в служебном помещении\"\n\t\t// frame.Status = \"Persona en oficina\"\n\t}\n\t\n\tif (personCounter > 0) {\n\t  frame.AddTextBox(\"Сотрудник в зоне проверки\", 0.35, 0.8)\n\t // frame.State = \"fail\"\n\t\t// // frame.Status = \"Человек в служебном помещении\"\n\t\t// frame.Status = \"Persona en oficina\"\n\t}\n\t\n\treturn true\n}"
+detectors:
+    - uuid: 85cbcd93-bcd6-4d5f-a6da-f5d6930e9abe
+      name: transport_detector
+      enabled: true
+      type: items
+      addrs:
+        - 10.6.0.101:60800
+      status:
+        version: "1.0"
+        name: transport_detector
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - car
+                - motorbike
+                - bus
+                - truck
+                - bicycle
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 416
+        height: 416
+      cmd: ""
+analytics:
+    - uuid: 5085881a-52c5-408a-af4e-f28f73a5ffdc
+      name: Car_entrance_check
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-67Dz_JL0U:
+            "true":
+                - filter-YtTcTujWv
+                - filter-QK5NVxYjU
+            "false": []
+        filter-QK5NVxYjU:
+            "true":
+                - region-nYaL9bHx_
+            "false": []
+        filter-YtTcTujWv:
+            "true":
+                - region-nYaL9bHx_
+            "false": []
+        region-nYaL9bHx_:
+            "true":
+                - script-8tVqaRJi6
+            "false":
+                - result
+        script-8tVqaRJi6:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-67Dz_JL0U
+            "false": []
+      blocks:
+        detector-67Dz_JL0U:
+            id: detector-67Dz_JL0U
+            type: detector
+            data:
+                id: 47
+                type: detector
+            position:
+                x: 220
+                "y": 100
+            uuid:
+                - 85cbcd93-bcd6-4d5f-a6da-f5d6930e9abe
+        filter-QK5NVxYjU:
+            id: filter-QK5NVxYjU
+            type: filter
+            data:
+                percentprob: "25"
+                type: filter
+                types:
+                    - car
+            position:
+                x: 420
+                "y": 180
+        filter-YtTcTujWv:
+            id: filter-YtTcTujWv
+            type: filter
+            data:
+                percentprob: "60"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 420
+                "y": -80
+        region-nYaL9bHx_:
+            id: region-nYaL9bHx_
+            type: region
+            data:
+                anchor: 0
+                regionnames:
+                    - car_entrance_check
+                type: region
+            position:
+                x: 640
+                "y": 100
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1140
+                "y": 100
+        script-8tVqaRJi6:
+            id: script-8tVqaRJi6
+            type: script
+            data:
+                id: 19
+                type: script
+            position:
+                x: 900
+                "y": -50
+            uuid:
+                - 0ff58f11-11ad-4a45-bb29-ba210e62f7b2
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: 0
+                "y": 100

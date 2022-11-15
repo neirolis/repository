@@ -1,0 +1,176 @@
+type: ""
+name: person_in_danger_zone
+version: v0.0.1
+scripts:
+    - uuid: c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+      name: filter_by_size
+      enabled: false
+      source: |-
+        function main(frame) {
+        	var items = []
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i];
+        		// if (item.BBox.W() < 0.03) continue;
+        		// rtmip.Debug(item.BBox.H())
+        		if (item.BBox.H() > 0.6 || item.BBox.W() > 0.6) continue;
+            if (item.BBox.H() < 0.1 || item.BBox.W() < 0.1) continue;
+        		items.push(item);
+        	}
+
+        	frame.Items = items;
+
+        	return true;
+        }
+    - uuid: 619255fc-e1c2-4b34-bb3e-117534dd46e9
+      name: person_in_danger_zone
+      enabled: false
+      source: "function main(frame) {\n\tvar counter = 0\n\tfor (var i in frame.Items) {\n\t  \n\t\tvar item = frame.Items[i]\n\t\tif (item.Type == \"person\") {\n\t\t  // item.State = \"pass\"\n\t\t  counter ++\n\t\t}\n\t}\n\t\n\tif (counter > 0) {\n\t  frame.State = \"fail\"\n\t\tframe.Status = \"Человек в опасной зоне\"\n\t}\n\t\n\treturn true\n}"
+detectors:
+    - uuid: 61aa66f4-76c9-450e-917d-434345de32d5
+      name: person-head-detector
+      enabled: false
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+analytics:
+    - uuid: 20065bdf-ae76-4029-8d53-693d5f5bf8d9
+      name: Makita_person_in_danger_zone
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-CNH_LQq0l:
+            "true":
+                - filter-zsF8FdXyg
+            "false": []
+        filter-zsF8FdXyg:
+            "true":
+                - tracking-zmmjmVwcb
+            "false": []
+        region-np-YX1o01:
+            "true":
+                - script-uhUdaR8Iy
+            "false":
+                - script-uhUdaR8Iy
+        script-6NqqcR7pS:
+            "true": []
+            "false": []
+        script-uhUdaR8Iy:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-CNH_LQq0l
+            "false": []
+        tracking-zmmjmVwcb:
+            "true":
+                - region-np-YX1o01
+            "false": []
+      blocks:
+        detector-CNH_LQq0l:
+            id: detector-CNH_LQq0l
+            type: detector
+            data:
+                id: 65
+                type: detector
+            position:
+                x: -500
+                "y": -41
+            uuid:
+                - 61aa66f4-76c9-450e-917d-434345de32d5
+        filter-zsF8FdXyg:
+            id: filter-zsF8FdXyg
+            type: filter
+            data:
+                percentprob: "50"
+                type: filter
+                types:
+                    - motorcycle
+                    - person
+            position:
+                x: -200
+                "y": -40
+        region-np-YX1o01:
+            id: region-np-YX1o01
+            type: region
+            data:
+                action: ""
+                anchor: 5
+                regionnames:
+                    - car_l
+                    - car_r
+                    - cars_l
+                    - car
+                    - makita_danger_zone
+                type: region
+            position:
+                x: 570
+                "y": -41
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1150
+                "y": -40
+        script-6NqqcR7pS:
+            id: script-6NqqcR7pS
+            type: script
+            data:
+                id: 3
+                type: script
+            position:
+                x: 40
+                "y": -190
+            uuid:
+                - c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+        script-uhUdaR8Iy:
+            id: script-uhUdaR8Iy
+            type: script
+            data:
+                id: 18
+                type: script
+            position:
+                x: 850
+                "y": -40
+            uuid:
+                - 619255fc-e1c2-4b34-bb3e-117534dd46e9
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -750
+                "y": -40
+        tracking-zmmjmVwcb:
+            id: tracking-zmmjmVwcb
+            type: tracking
+            data:
+                scale: "2"
+                tracks: true
+                type: tracking
+            position:
+                x: 270
+                "y": -40

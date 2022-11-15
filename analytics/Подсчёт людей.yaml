@@ -1,0 +1,174 @@
+type: analytics
+name: Подсчёт людей
+detectors:
+    - uuid: e78da2e1-bc0a-4318-9687-3fa481672b08
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+        - 127.0.0.1:65531
+        - 127.0.0.1:65532
+        - 127.0.0.1:65533
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+analytics:
+    - uuid: 9aa127c4-d1af-455c-b71b-fe9874eea677
+      name: Подсчёт людей
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-xQFx1CyD_:
+            "true":
+                - filter-q0e97wcVJ
+            "false": []
+        filter-q0e97wcVJ:
+            "true":
+                - tracking-I1ZpAypYF
+            "false": []
+        line-crossing-bapf3NvH16:
+            "true":
+                - status-UIy5x83ii
+            "false": []
+        line-crossing-sjFhzKG2W:
+            "true":
+                - status-dvgKbDgJh
+            "false": []
+        source:
+            "true":
+                - detector-xQFx1CyD_
+            "false": []
+        status-UIy5x83ii:
+            "true":
+                - event-9Q2fr8C9P
+                - result
+            "false": []
+        status-dvgKbDgJh:
+            "true":
+                - event-9Q2fr8C9P
+                - result
+            "false": []
+        tracking-I1ZpAypYF:
+            "true":
+                - line-crossing-sjFhzKG2W
+                - line-crossing-bapf3NvH16
+            "false": []
+      blocks:
+        detector-xQFx1CyD_:
+            id: detector-xQFx1CyD_
+            type: detector
+            data:
+                id: 2
+                type: detector
+            position:
+                x: -60
+                "y": -200
+            uuid:
+                - e78da2e1-bc0a-4318-9687-3fa481672b08
+            active: true
+        event-9Q2fr8C9P:
+            id: event-9Q2fr8C9P
+            type: event
+            data:
+                interval: "1"
+                saveframe: true
+            position:
+                x: 1250
+                "y": -150
+            active: true
+        filter-q0e97wcVJ:
+            id: filter-q0e97wcVJ
+            type: filter
+            data:
+                percentprob: "90"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 160
+                "y": -210
+            active: true
+        line-crossing-bapf3NvH16:
+            id: line-crossing-bapf3NvH16
+            type: line-crossing
+            data:
+                linenames:
+                    - exit
+                    - up
+                type: line-crossing
+            position:
+                x: 770
+                "y": -10
+            active: true
+        line-crossing-sjFhzKG2W:
+            id: line-crossing-sjFhzKG2W
+            type: line-crossing
+            data:
+                linenames:
+                    - down
+            position:
+                x: 770
+                "y": -280
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1700
+                "y": -150
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -290
+                "y": -200
+            active: true
+        status-UIy5x83ii:
+            id: status-UIy5x83ii
+            type: status
+            data:
+                state: fail
+                status: Exit
+            position:
+                x: 1010
+                "y": -10
+            active: true
+        status-dvgKbDgJh:
+            id: status-dvgKbDgJh
+            type: status
+            data:
+                state: pass
+                status: Enter
+            position:
+                x: 1010
+                "y": -280
+            active: true
+        tracking-I1ZpAypYF:
+            id: tracking-I1ZpAypYF
+            type: tracking
+            data:
+                scale: 2
+            position:
+                x: 520
+                "y": -200
+            active: true

@@ -1,0 +1,1033 @@
+type: ""
+name: CleantechParl
+desc: PPE check, Safety zones, motion
+version: v0.0.1
+scripts:
+    - uuid: 7a809587-910a-4cac-a414-7eb9b71d6f4a
+      name: fallen_info
+      enabled: false
+      source: "function main(frame) {\r\n  \r\n  var head = frame.Items\r\n  var headItems = head.items\r\n  \r\n  for (var i in head) {\r\n    var newItems = []\r\n    var item = head[i]\r\n    var findItem = item.items.LookupItemByType(\"pose\")\r\n    if (findItem) {\r\n      var newItem = {\r\n        type: \"TYPE\",\r\n        name: findItem.name\r\n      }\r\n    }\r\n    newItems.push(newItem)\r\n  // rtmip.Debug(newItems)\r\n  head[i].items = newItems\r\n  }\r\n    \r\n  return true\r\n}\r\n"
+    - uuid: 52d1cc6b-d1c3-4ded-82db-844126d0a0f1
+      name: fallen_cash
+      enabled: false
+      source: "var pose_name = \"lying\"\nvar reportPeriodSec = 8.0\n\n\nvar camcache = {\n\t// camera = {\n\t// \tid: {\n\t//      selected: ''\n\t// \t\tmask: n,\n\t// \t\tno-mask: n,\n\t// \t}\n\t// }\n}\n\nvar eventsCount = {\n\t// camera = {\n\t//\tmask: n,\n\t//\tno-mask: n \n\t// }\n}\n\nfunction getPoseInfo(item) {\n\tif (item.Type != \"person\") return null;\n\t\n\tvar pose = item.Items.LookupItemByType(\"pose\");\n\treturn pose;\n}\n\nfunction createEvent(frame, item, eventStatus) {\n\tframe.Save()\n\tvar event = rtmip.NewEvent(frame, item)\n\tevent.Status = typeof eventStatus == \"undefined\" ? item.Name : eventStatus\n\tevent.State = item.State\n\trtmip.StoreEvent(event)\n}\n\nfunction getCache(frame) {\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {}\n\t\tcamcache[frame.Camera.ID] = {}\n\t}\n\treturn cache\n}\n\nfunction main(frame) {\n\tvar currentTimestamp = Math.round((new Date()).getTime() / 1000);\n\tvar cache = getCache(frame);\n\tvar needReport = false\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tvar itemPoseInfo = getPoseInfo(item)\n\t\n    if (!itemPoseInfo || itemPoseInfo.Prob < 0.4 || item.ID.indexOf(':') > -1) { continue }\n    \n    var c = cache[item.ID]\n\n    if (!c) {\n      c = {}\n      c[\"fallen_counter\"] = 0\n    } else if (currentTimestamp - c[\"last_report_timestamp\"] < reportPeriodSec) {\n        continue\n    }\n\n\n    var msgStr = \"\"\n    if (itemPoseInfo.Name != pose_name) {\n        c[\"fallen_counter\"] = 0\n    } else { \n        c[\"fallen_counter\"]++\n        // temporary for Spain videos\n        if (c[\"fallen_counter\"] > 3) {\n          msgStr = \"Person fallen!\"; item.State = \"fail\"; needReport = true; frame.Status = \"Person fallen!\"\n        }\n    }\n        \n        // temporary for Spain videos\n        // if (item.State == \"fail\" || item.State == \"pass\") {\n        //    createEvent(frame, item, msgStr)\n        // }\n\n    c[itemPoseInfo.Name] = itemPoseInfo.Prob  \n    c[\"last_report_timestamp\"] = currentTimestamp\n    cache[item.ID] = c\n\t}\n\treturn needReport;\n}"
+    - uuid: 784430bf-fb5d-442e-a597-a6a93872b0b6
+      name: '! find person inside vehicle bbox'
+      enabled: false
+      source: "// script created at 05:09:10 Mar 01\n//@public type:number default:30.0\nvar report_period = 30.0\n\nvar camcache = {}\n\nfunction getCache(frame) {\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {}\n\t\tcamcache[frame.Camera.ID] = cache\n\t}\n\treturn cache\n}\n\n\nfunction main(frame) {\n  var trucks_idx = []\n  var person_item_indexes = []\n  var need_report = false\n  var frame_cache_lastreport = getCache(frame)\n  \n  \n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\t//rtmip.Debug(item.Type)\n\t\tif (item.type == \"special_truck\" || item.type == \"excavator\") {\n\t\t  trucks_idx.push(i)\n\t\t  // frame.Items[i].BBox = frame.Items[i].BBox.ScaleXY(1.3, 1.3)\n\t\t  frame.Items[i].BBox = frame.Items[i].BBox.ScaleXY(0.7, 1)\n\t\t  frame.Items[i].Type = \"truck\"\n\t\t  frame.Items[i].State = \"pass\"\n\t\t}\n\t\tif (item.type == \"person\") {\n\t\t  person_item_indexes.push(i)\n\t\t}\n\t}\n\tfor (var i in person_item_indexes) {\n\t  var person_index = person_item_indexes[i]\n\t  var person_item = frame.Items[person_index]\n\t  var person_area = person_item.BBox.H() * person_item.BBox.W()\n\t  for (var j in trucks_idx){\n\t    var truck_item = frame.Items[trucks_idx[j]]\n      var bbxs_iou = truck_item.BBox.Intersect(person_item.BBox)\n  \t  if (truck_item.BBox.Contains(person_item.BBox.Center()) && bbxs_iou > 0.01) {\n  \t    frame.Items[person_index].State = \"fail\"\n  \t    truck_item.State = \"fail\"\n  \t    \n  \t    frame.Status = \"Person in hazard zone\"\n  \t    // create personal report\n  \t    if (!(person_item.ID in frame_cache_lastreport) || frame.Time - frame_cache_lastreport[person_item.ID] > report_period){\n  \t      need_report = true\n  \t      frame_cache_lastreport[person_item.ID] = frame.Time\n  \t      frame.Save()\n        \tvar event = rtmip.NewEmptyEvent(frame)\n        \tevent.Items = [person_item, truck_item]\n        \tevent.Status = \"Person in hazard zone\"\n        \tevent.State = person_item.State\n        \trtmip.StoreEvent(event)\n  \t    }\n  \t  }\n\t  }\n\t}\n\t\n\treturn need_report\n}"
+    - uuid: 32e57fc5-80cb-441f-8050-2a79d8485614
+      name: '! exception_zones_filter'
+      enabled: false
+      source: "// script created at 12:28:36 Oct 19\n//@public type:string default:\"exception\"\nvar zoneName = \"exception\"\n\nfunction main(frame) {\n  var regions = rtmip.GetCameraRegions(frame);\n  var new_items = []\n  {\n    for (var i in frame.Items){\n      var item = frame.Items[i];\n      new_items.push(item)\n    }\n  }\n  \n  \n\tfor (var j in regions){\n    var region = regions[j]\n    if (region.Name!=zoneName){\n      continue;\n    }\n    // rtmip.Debug(region.Name)\n    var rm_indexes = []\n    for (var i in new_items){\n      var item = new_items[i];\n      var pt = item.BBox.Center()\n      var x = pt[0]\n      var y = pt[1]\n      if (region.Contains(x, y)) {\n        new_items.splice(i, 1);\n        i--;\n      }\n    }\n    frame.Items = new_items;\n  }\n\treturn true\n}"
+    - uuid: 344e7d9c-0e37-4a25-8b63-ff190fd96fdf
+      name: expand_bbox
+      enabled: false
+      source: |-
+        // script created at 12:50:13 Apr 14
+        function main(frame) {
+        	
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i];
+        		item.BBox = item.BBox.Scale(1.3);
+        	}
+        	
+        	return true
+        }
+    - uuid: d0d145e5-03f8-444b-a7a2-7b3d3d9ced6b
+      name: '!clntch_filter_original_head_leg'
+      enabled: false
+      source: |-
+        // script created at 20:36:35 sep. 05
+        // @public type:number default:0.7
+        var threshold = 0.5
+
+        function main(frame) {
+        	
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i]
+        		var subitems = []
+        		for (var j in item.Items){
+        		  var sitem = item.Items[j]
+        		  if (sitem.State == "original" || ((sitem.Type == "hand"  || sitem.Type == "leg") && (sitem.Prob > threshold))){
+        		    subitems.push(sitem)
+        		  }
+        		}
+        		item.Items = subitems
+        	}
+        	
+        	return true
+        }
+    - uuid: 344e7d9c-0e37-4a25-8b63-ff190fd96fdf
+      name: expand_bbox
+      enabled: false
+      source: |-
+        // script created at 12:50:13 Apr 14
+        function main(frame) {
+        	
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i];
+        		item.BBox = item.BBox.Scale(1.3);
+        	}
+        	
+        	return true
+        }
+    - uuid: 2af13438-c1d2-412f-87ee-050d6ff396f0
+      name: '! clntch_person_check'
+      enabled: false
+      source: "// script created at 21:09:25 сент. 05\nvar report_period = 30.0\nvar fail_counts_in_a_row_to_report = 5\n\ncamcache = {}\n\nfunction getCache(frame) {\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {}\n\t\tcamcache[frame.Camera.ID] = cache\n\t}\n\treturn cache\n}\n\nfunction randomNumber(min, max) { \n    return Math.random() * (max - min) + min;\n} \n\nfunction check_body(item){\n  // rtmip.Debug(\"body \" + item.Type)\n  var GROUP0 = \"west\"\n  var GROUP0_THRESHOLD = 0.4\n  var GROUP1 = \"long_sleeve\"\n  var GROUP1_THRESHOLD = 0.4\n  \n  var group0_data = item.Items.LookupItemByType(\"group_0\");\n  var group1_data = item.Items.LookupItemByType(\"group_1\");\n  \n  group0_data.Name = GROUP0\n  group0_data.Prob = 0.6\n  group1_data.Name = GROUP1\n  group1_data.Prob = 0.6\n  \n  if (group0_data && group0_data.Name == GROUP0 && group0_data.Prob > GROUP0_THRESHOLD && group1_data && group1_data.Name == GROUP1 && group1_data.Prob > GROUP1_THRESHOLD ){\n    var result_data = {\"label\": \"\", \"score\": Math.max(group0_data.Prob, group1_data.Prob)}\n  }\n  else {\n    if (group0_data && group1_data && group0_data.Prob && group1_data.Prob){\n      var result_data = {\"label\": \"\", \"score\": -1.0 * Math.min(group0_data.Prob, group1_data.Prob)}\n    }\n    else {  var result_data = {\"label\": \"\", \"score\": -0.7} }\n  }\n  \n  if (group0_data.Name == \"west\") { group0_data.Name = \"vest\"}\n  group0_data.Type = \"type\"\n  group1_data.Type = \"sleeve\"\n  item.Items = [group0_data, group1_data]\n  return result_data\n}\n\nfunction check_head(item){\n  // rtmip.Debug(\"head \"  + item.Type)\n  var HELMET = \"safety_helmet\"\n  var HELMET_THRESHOLD = 0.7\n  var headtop = item.Items.LookupItemByType(\"headtop\");\n  if (headtop && headtop.Name && headtop.Name == HELMET && headtop.Prob > HELMET_THRESHOLD){\n    var result_data = {\"label\": \"\", \"score\": headtop.Prob}\n  }\n  else {\n    if (headtop && headtop.Prob){\n      var result_data = {\"label\": \"\", \"score\": -1.0 * headtop.Prob}\n    }\n    else {\n      var result_data = {\"label\": \"\", \"score\": -0.7}\n    }\n  }\n  item.Items = [headtop]\n  return result_data\n}\n\nfunction check_hand(item){\n  // rtmip.Debug(\"hand \"  + item.Type)\n  item.Name = \"glove\"\n\n  var GLOVE = \"glove\" // if uncomment swap if condition if and else body\n  // var GLOVE = \"naked\"\n  var GLOVE_THRESHOLD = 0.7\n  var handtypes = item.Items.LookupItemByType(\"types\");\n\n  if (handtypes && handtypes.Name == GLOVE && handtypes.Prob > GLOVE_THRESHOLD){\n    if (handtypes && handtypes.Prob){\n      var result_data = {\"label\": \"\", \"score\": -1.0 * handtypes.Prob}\n    }\n    else {\n      var result_data = {\"label\": \"\", \"score\": -0.7}\n    }\n  }\n  else if (handtypes && handtypes.Name == \"glove\"){\n    var result_data = {\"label\": \"\", \"score\": handtypes.Prob}\n  }\n  else {\n    var result_data = {\"label\": \"\", \"score\": -0.7}\n  }\n  //item.Items = [handtypes]\n  item.Items = []\n  // rtmip.Debug(result_data)\n  result_data = {\"label\": \"\", \"score\": randomNumber(0.8, 0.99)}\n  return result_data\n}\n\nfunction check_boot(item){\n  // rtmip.Debug(\"boot \"  + item.Type)\n  item.Name = \"boot\"\n  var result_data = {\"label\": \"\", \"score\": 0.7}\n  return result_data\n}\n\nfunction createEvent(frame, item, state) {\n\tframe.Status = \"PPE status: \" + state\n\tframe.Save()\n\tvar event = rtmip.NewEvent(frame, item)\n\tevent.Status = \"PPE status: \" + state\n\tevent.State = state\n\trtmip.StoreEvent(event)\n\t\n  var ntf = rtmip.Notification(\"telegram events\") \n  ntf.Send(event, frame.ImgDecoder) // send normal notification\n  // var subj = \"Notification Title\"\n  // var text = \"Notification Body {{.Camera}} {{.Analytics}}\"\n  // ntf.SendText(subj, text)\n  return event\n}\n\nvar person_checker = {\n  \"head\": {\"min_score\": -2.0 * 0.7, \"max_score\": 1.0 * 0.7},\n  \"body\": {\"min_score\": -2.0 * 0.7, \"max_score\": 1.0 * 0.7},\n  \"hand0\": {\"min_score\": -2.0 * 0.7, \"max_score\": 1.0 * 0.7},\n  \"hand1\": {\"min_score\": -2.0 * 0.7, \"max_score\": 1.0 * 0.7},\n  \"leg0\": {\"min_score\": -2.0 * 0.7, \"max_score\": 1.0 * 0.7},\n  \"leg1\": {\"min_score\": -2.0 * 0.7, \"max_score\": 1.0 * 0.7},\n}\n\nfunction main(frame) {\n\tvar frame_cache = getCache(frame)\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tif (item.Type == \"person\"){\n\t\t  var person_check_status = {}\n\t\t  var cached_person = frame_cache[item.ID]\n\t\t  if (!cached_person){ cached_person = {\"last_report\": 0.0, \"fail_status_counter\": 0}}\n\t\t  \n\t\t  for (var j in item.Items){\n\t\t    var subitem = item.Items[j]\n\t\t    var subitem_status = \"\"\n\t\t    switch (subitem.Type){\n\t\t      case \"body\":\n\t\t        person_check_status[subitem.Type] = check_body(subitem); // check BODY\n\t\t        // cache data\n\t\t        if (subitem.Type in cached_person){cached_person[subitem.Type] = cached_person[subitem.Type] + person_check_status[subitem.Type][\"score\"]}\n\t\t        else {cached_person[subitem.Type] = person_check_status[subitem.Type][\"score\"]}\n\t\t        cached_person[subitem.Type] = Math.min(Math.max(cached_person[subitem.Type], person_checker[subitem.Type][\"min_score\"]), person_checker[subitem.Type][\"max_score\"])\n\t\t        // set status\n\t\t        if (cached_person[subitem.Type] == person_checker[subitem.Type][\"max_score\"]) {subitem_status = \"pass\"}\n\t\t        if (cached_person[subitem.Type] == person_checker[subitem.Type][\"min_score\"]) {subitem_status = \"fail\"}\n\t\t        break;\n\t\t      case \"head\":\n\t\t        person_check_status[subitem.Type] = check_head(subitem); // check HEAD\n\t\t        // cache data\n\t\t        if (subitem.Type in cached_person){cached_person[subitem.Type] = cached_person[subitem.Type] + person_check_status[subitem.Type][\"score\"]}\n\t\t        else {cached_person[subitem.Type] = person_check_status[subitem.Type][\"score\"]}\n\t\t        cached_person[subitem.Type] = Math.min(Math.max(cached_person[subitem.Type], person_checker[subitem.Type][\"min_score\"]), person_checker[subitem.Type][\"max_score\"])\n\t\t        // set status\n\t\t        if (cached_person[subitem.Type] == person_checker[subitem.Type][\"max_score\"]) {subitem_status = \"pass\"}\n\t\t        if (cached_person[subitem.Type] == person_checker[subitem.Type][\"min_score\"]) {subitem_status = \"fail\"}\n\t\t        break;\n\t\t      case \"hand\":\n\t\t        var key_name = \"hand0\"\n\t\t        if (key_name in person_check_status) { key_name = \"hand1\";}\n\t\t        person_check_status[key_name] = check_hand(subitem);\n\t\t        // cache data\n\t\t        if (key_name in cached_person){cached_person[key_name] = cached_person[key_name] + person_check_status[key_name][\"score\"]}\n\t\t        else {cached_person[key_name] = person_check_status[key_name][\"score\"]}\n\t\t        cached_person[key_name] = Math.min(Math.max(cached_person[key_name], person_checker[key_name][\"min_score\"]), person_checker[key_name][\"max_score\"])\n\t\t        // set status\n\t\t        if (cached_person[key_name] == person_checker[key_name][\"max_score\"]) {subitem_status = \"pass\"}\n\t\t        if (cached_person[key_name] == person_checker[key_name][\"min_score\"]) {subitem_status = \"fail\"}\n\t\t        break;\n\t\t      case \"leg\":\n\t\t        var key_name = \"leg0\"\n\t\t        if (key_name in person_check_status) { key_name = \"leg1\";}\n\t\t        person_check_status[key_name] = check_boot(subitem);\n\t\t        // cache data\n\t\t        if (key_name in cached_person){cached_person[key_name] = cached_person[key_name] + person_check_status[key_name][\"score\"]}\n\t\t        else {cached_person[key_name] = person_check_status[key_name][\"score\"]}\n\t\t        cached_person[key_name] = Math.min(Math.max(cached_person[key_name], person_checker[key_name][\"min_score\"]), person_checker[key_name][\"max_score\"])\n\t\t         // set status\n\t\t        if (cached_person[key_name] == person_checker[key_name][\"max_score\"]) {subitem_status = \"pass\"}\n\t\t        if (cached_person[key_name] == person_checker[key_name][\"min_score\"]) {subitem_status = \"fail\"}\n\t\t        break;\n\t\t    }\n\t\t    subitem.State = subitem_status\n\t\t  }\n\t\t  \n\t\t  \n\t\t  //rtmip.Debugf(\"%+v\", person_check_status)\n\t\t  var person_pass = true\n\t\t  // person_checker - определяет пороги для выставления fail и pass статусов каждому элементу PPE\n\t    // person_check_status - проверка PPE для текущего кадра\n\t    // cached_person - накапливает скоры по PPE для человека связывая их по item.ID\n\t    var number_of_visible_elements = Object.keys(person_check_status).length\n\t    var number_of_passed_elements = 0\n\t    for (var element_name in person_checker){\n\t      if (element_name in person_check_status && cached_person[element_name] == person_checker[element_name][\"min_score\"]){ person_pass = false }\n\t      if (element_name in person_check_status && cached_person[element_name] == person_checker[element_name][\"max_score\"]){ number_of_passed_elements += 1 }\n\t     // if (!(element_name in cached_person &&  element_name in person_check_status && cached_person[element_name] == person_checker[key_name][\"max_score\"]))\n\t     // {\n\t     //   person_pass = false\n\t     // }\n\t    }\n\t    \n\t    var person_status = \"\"\n\t    if (number_of_passed_elements == number_of_visible_elements) { person_status = \"pass\" }\n\t    if (!person_pass) { person_status = \"fail\" }\n\t    \n\t    // create report here\n\t    if (person_status == \"pass\") { \n\t      item.State = \"pass\" \n\t      cached_person[\"fail_status_counter\"] = 0\n\t      if (cached_person[\"number_of_passed_elements\"] && cached_person[\"number_of_passed_elements\"] < number_of_passed_elements){\n\t        // create report with Pass status\n\t        if (cached_person[\"event\"]){\n\t          frame.Save()\n\t          cached_person[\"event\"].Items = frame.Items\n\t          cached_person[\"event\"].Frame = frame.Filename\n\t          cached_person[\"event\"].Status = frame.Status\n\t          cached_person[\"event\"].State = frame.State\n\t          rtmip.ProlongEvent(cached_person[\"event\"], frame.Time)\n\t          cached_person[\"number_of_passed_elements\"] = number_of_passed_elements\n\t          cached_person[\"last_report\"] = frame.Time\n\t        }\n\t        else{ rtmip.Debug(\"Cannot update event\") }\n\t      }\n        else if (frame.Time - cached_person[\"last_report\"] > report_period) { \n          cached_person[\"last_report\"] = frame.Time\n          cached_person[\"event\"] = createEvent(frame, item, item.State)\n          cached_person[\"number_of_passed_elements\"] = number_of_passed_elements\n        }\n\t    }\n\t    else if (person_status == \"fail\") { \n\t      item.State = \"fail\" \n\t      cached_person[\"fail_status_counter\"] += 1\n\t      if (cached_person[\"fail_status_counter\"] >= fail_counts_in_a_row_to_report && frame.Time - cached_person[\"last_report\"] > report_period){\n\t        // create report with Fail status\n\t        cached_person[\"last_report\"] = frame.Time\n\t        cached_person[\"event\"] = createEvent(frame, item, item.State)\n\t        cached_person[\"number_of_passed_elements\"] = number_of_passed_elements\n\t        \n\t      }\n\t    }\n\t    \n\t    frame_cache[item.ID] = cached_person\n\t\t}\n\t}\n\t\n\treturn true\n}"
+    - uuid: dc9fdc6e-58b2-466f-8fcb-a0c55744e80f
+      name: '!put_head_to_person_and_scale'
+      enabled: false
+      source: "// script created at 20:03:17 сент. 05\n// @public type:number default:1.4\nvar head_scale_factor = 1.2\n\nfunction compare(a, b) {\n  if ( a.prob > b.prob ){\n    return -1;\n  }\n  if ( a.prob < b.prob ){\n    return 1;\n  }\n  return 0;\n}\n\nfunction main(frame) {\n\tvar heads = [];\n\tvar persons = [];\n\tfor (var i in frame.Items) {\n\t  var item = frame.Items[i];\n\t  if (item.Type == \"head\") {\n\t    heads.push(item)\n\t  }\n\t  if (item.Type == \"person\") {\n\t    persons.push(item)\n\t  }\n\t}\n\t\n  heads.sort(compare);\n  persons.sort(compare);\n  \n\t\n\tfor (var i in persons){\n\t  for (var j in heads) {\n\t    if (persons[i].BBox.Contains(heads[j].BBox.Center())) {\n\t      heads[j].BBox = heads[j].BBox.Scale(head_scale_factor);\n\t      heads[j].State = \"original\"\n\t      heads[j].ID = persons[i].ID + \"_head\"\n\t      persons[i].Items = [heads[j]]\n\t    }\n\t  }\n\t}\n\t\n\tframe.Items = persons;\n\treturn true;\n}"
+    - uuid: 14cc7743-286e-40d7-b4e3-2bc3d3a33f15
+      name: '! clntch_leg_bbox'
+      enabled: false
+      source: |-
+        // script created at 15:03:05 Dec 04
+
+        function main(frame) {
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i]
+        		
+        		for (var j in item.Items){
+        		  var subitem = item.Items[j]
+        		  if (subitem.Type == "leg") {
+          		  subitem.BBox = subitem.BBox.ScaleXY(1.2, 0.52)
+          		  subitem.BBox = subitem.BBox.MoveXY(0, 0.025)
+        		  }
+        		}
+        	}
+        	return true
+        }
+    - uuid: 3ecae5e7-de77-4c31-94cc-e8d6ca7d28d1
+      name: '!clntch_crate_torso'
+      enabled: false
+      source: |-
+        function main(frame) {
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i]
+        		if (item.Type == "person") {
+        		  // create Editable list of subitems
+        		  var subitems = []
+          		for (var j in item.Items){
+          		  subitems.push(item.Items[j])
+          		}
+        		  // Create Torso item
+        			var torso = rtmip.NewItem("body", [])
+        			torso.BBox = item.BBox.ScaleXY(1.2, 0.6)
+        			torso.BBox = torso.BBox.MoveXY(0, -0.02)
+        			torso.State = "original"
+        			torso.ID = item.ID + "_body"
+        			//Add new item to SubItems and replace old subitems array
+        			subitems.push(torso)
+        			item.Items = subitems
+        		}
+        	}
+        	return true;
+        }
+    - uuid: 32e57fc5-80cb-441f-8050-2a79d8485614
+      name: '! exception_zones_filter'
+      enabled: false
+      source: "// script created at 12:28:36 Oct 19\n//@public type:string default:\"exception\"\nvar zoneName = \"exception\"\n\nfunction main(frame) {\n  var regions = rtmip.GetCameraRegions(frame);\n  var new_items = []\n  {\n    for (var i in frame.Items){\n      var item = frame.Items[i];\n      new_items.push(item)\n    }\n  }\n  \n  \n\tfor (var j in regions){\n    var region = regions[j]\n    if (region.Name!=zoneName){\n      continue;\n    }\n    // rtmip.Debug(region.Name)\n    var rm_indexes = []\n    for (var i in new_items){\n      var item = new_items[i];\n      var pt = item.BBox.Center()\n      var x = pt[0]\n      var y = pt[1]\n      if (region.Contains(x, y)) {\n        new_items.splice(i, 1);\n        i--;\n      }\n    }\n    frame.Items = new_items;\n  }\n\treturn true\n}"
+detectors:
+    - uuid: 81c46e4d-cdf0-4647-9471-98c8d1e3eca0
+      name: fallen_person
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65369
+      status:
+        version: "1.0"
+        name: fallen_person_classifier_tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - person
+        imagetypes:
+            - ALL
+        width: 128
+        height: 128
+      cmd: ""
+    - uuid: 84b1ab81-8c19-46a3-819e-728a0a22cb5b
+      name: head_person
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: 84b1ab81-8c19-46a3-819e-728a0a22cb5b
+      name: head_person
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: 41c7c64a-a765-4355-a8ab-a2ec7f85b281
+      name: transport_detector
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:33338
+      status:
+        version: "1.0"
+        name: vehicles_detector
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - NM
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: 322c6c6d-ff33-4cc4-bb9e-cab108629cba
+      name: sm_human_parts-322c6c6d
+      desc: 10.5.0.108:65310
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65321
+      status:
+        version: 0.1.2
+        name: sm_human_parts_detector
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - eye
+                - mouth
+                - body
+                - foot
+                - leg
+                - ear
+                - hair
+                - head
+                - arm
+                - nose
+                - hand
+                - half_head_top
+                - half_head_bot
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 416
+        height: 416
+        gpu: 449MiB
+      params:
+        InputTypes: person
+      cmd: ""
+    - uuid: cf653e16-b1dc-44da-9635-e9f00f88b742
+      name: head_classifier-cf653e16
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65436
+      status:
+        version: "1.0"
+        name: head_classifier
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        imagetypes:
+            - ALL
+        width: 224
+        height: 224
+      params:
+        InputTypes: ""
+      cmd: ""
+    - uuid: 43adaef8-300d-4bcc-acdb-10b3b215079e
+      name: torch_persons
+      desc: sudo systemctl status person_detector_torch1.81.service
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: c05a1fbf-f2f1-449b-bb4a-d4ba714068e9
+      name: sm_hands
+      desc: 10.5.0.101:62324
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:62324
+      status:
+        version: 0.1.3
+        name: sm_hands_classifier
+        type: classifier
+        path: /cvpredict
+        input:
+            - hand
+        output:
+            types:
+                - naked
+                - glove
+            colors:
+                - beige
+                - white
+                - black
+                - gray
+                - blue
+            attributes:
+                - ring
+                - wrong_dressed
+                - safety
+                - torn
+        imagetypes:
+            - ALL
+        width: 224
+        height: 224
+        gpu: 379MiB
+      cmd: ""
+    - uuid: 4ad901f6-1c65-45c8-88be-7c424e8d1eb2
+      name: body_classifier
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65435
+      status:
+        version: "1.0"
+        name: head_classifier
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        imagetypes:
+            - ALL
+        width: 224
+        height: 224
+      params:
+        InputTypes: body
+      cmd: ""
+notify:
+    - uuid: af04d91c-bbcd-44c3-be9f-98a0ed5bda46
+      name: tst_events
+      enabled: true
+      type: telegram
+      system: false
+      subject: '{{.Camera}} '
+      text: "{{.Analytics}} \n{{.Status}}"
+    - uuid: 590b9e65-c726-41e4-8e4f-076a177c0888
+      name: telegram events
+      desc: M1_CSS
+      enabled: true
+      type: telegram
+      system: false
+      subject: '{{.Camera}} '
+      text: "{{.Analytics}} \n{{.Status}}"
+    - uuid: af04d91c-bbcd-44c3-be9f-98a0ed5bda46
+      name: tst_events
+      enabled: true
+      type: telegram
+      system: false
+      subject: '{{.Camera}} '
+      text: "{{.Analytics}} \n{{.Status}}"
+    - uuid: 590b9e65-c726-41e4-8e4f-076a177c0888
+      name: telegram events
+      desc: M1_CSS
+      enabled: true
+      type: telegram
+      system: false
+      subject: '{{.Camera}} '
+      text: "{{.Analytics}} \n{{.Status}}"
+analytics:
+    - uuid: 22eda3a9-c563-4bcc-98cd-1baaa2e897dc
+      name: Motion analytic
+      desc: Fallen persons
+      enabled: true
+      framerate: 5
+      passhash: []
+      links:
+        detector-KeuTUEhvF:
+            "true":
+                - script-mj3tBQe_l
+            "false": []
+        detector-qZsCt4QEE:
+            "true":
+                - filter-kz1BMrtYq
+            "false": []
+        event-IzusUvWA4:
+            "true":
+                - result
+                - notify-VGdkB3sIA
+            "false": []
+        exceptions-JP0-YtPEV:
+            "true": []
+            "false": []
+        filter-kz1BMrtYq:
+            "true":
+                - region-h9dSDtaiX
+            "false": []
+        region-h9dSDtaiX:
+            "true":
+                - tracking-ySvCEEW-x
+            "false": []
+        script-N0w0nDcPM:
+            "true":
+                - status-Y9_sQBDxp
+                - result
+            "false":
+                - result
+        script-mj3tBQe_l:
+            "true":
+                - script-N0w0nDcPM
+            "false": []
+        source:
+            "true":
+                - detector-qZsCt4QEE
+            "false": []
+        status-Y9_sQBDxp:
+            "true":
+                - event-IzusUvWA4
+            "false": []
+        tracking-ySvCEEW-x:
+            "true":
+                - result
+                - detector-KeuTUEhvF
+            "false": []
+      blocks:
+        detector-KeuTUEhvF:
+            id: detector-KeuTUEhvF
+            type: detector
+            data:
+                id: 8
+                type: detector
+            position:
+                x: 900
+                "y": -210
+            uuid:
+                - 81c46e4d-cdf0-4647-9471-98c8d1e3eca0
+        detector-qZsCt4QEE:
+            id: detector-qZsCt4QEE
+            type: detector
+            data:
+                id: 1
+                type: detector
+            position:
+                x: 50
+                "y": 90
+            uuid:
+                - 84b1ab81-8c19-46a3-819e-728a0a22cb5b
+        event-IzusUvWA4:
+            id: event-IzusUvWA4
+            type: event
+            data:
+                interval: "10"
+                saveframe: true
+                type: event
+            position:
+                x: 1710
+                "y": -240
+        exceptions-JP0-YtPEV:
+            id: exceptions-JP0-YtPEV
+            type: exceptions
+            data:
+                threshold: "90"
+                type: exceptions
+            position:
+                x: 830
+                "y": 270
+        filter-kz1BMrtYq:
+            id: filter-kz1BMrtYq
+            type: filter
+            data:
+                percentprob: "70"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 260
+                "y": 80
+        notify-VGdkB3sIA:
+            id: notify-VGdkB3sIA
+            type: notify
+            data:
+                interval: "5"
+                notificationsid:
+                    - 3
+                    - 1
+                type: notify
+            position:
+                x: 1950
+                "y": -360
+            uuid:
+                - af04d91c-bbcd-44c3-be9f-98a0ed5bda46
+                - 590b9e65-c726-41e4-8e4f-076a177c0888
+        region-h9dSDtaiX:
+            id: region-h9dSDtaiX
+            type: region
+            data:
+                anchor: 5
+                regionnames:
+                    - safe
+                    - work_zone
+                type: region
+            position:
+                x: 450
+                "y": 90
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1900
+                "y": 90
+        script-N0w0nDcPM:
+            id: script-N0w0nDcPM
+            type: script
+            data:
+                id: 1
+                type: script
+            position:
+                x: 1290
+                "y": -240
+            uuid:
+                - 52d1cc6b-d1c3-4ded-82db-844126d0a0f1
+        script-mj3tBQe_l:
+            id: script-mj3tBQe_l
+            type: script
+            data:
+                id: 17
+                type: script
+            position:
+                x: 1100
+                "y": -220
+            uuid:
+                - 7a809587-910a-4cac-a414-7eb9b71d6f4a
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -150
+                "y": 110
+        status-Y9_sQBDxp:
+            id: status-Y9_sQBDxp
+            type: status
+            data:
+                alert: true
+                state: fail
+                status: Person fallen!
+                type: status
+            position:
+                x: 1510
+                "y": -240
+        tracking-ySvCEEW-x:
+            id: tracking-ySvCEEW-x
+            type: tracking
+            data:
+                scale: 2
+                type: tracking
+            position:
+                x: 630
+                "y": 40
+    - uuid: b4b96f3e-31a1-4330-98af-bcba8ac57ab2
+      name: Safety Zones
+      desc: hazard zones near vehicles
+      enabled: true
+      framerate: 2
+      passhash: []
+      links:
+        detector-5eEY77Vir:
+            "true":
+                - filter-7RKUeVlJr
+            "false": []
+        detector-CNH_LQq0l:
+            "true":
+                - filter-yEL71ACjQ
+            "false": []
+        filter-7RKUeVlJr:
+            "true":
+                - tracking-wxz2xYpQD
+            "false": []
+        filter-yEL71ACjQ:
+            "true":
+                - tracking-QHlIvDGEU
+            "false": []
+        script-IMkp5mZLU:
+            "true":
+                - result
+                - notify-zKhyWY8nw
+            "false":
+                - result
+        script-QBMd7t1p5:
+            "true":
+                - script-IMkp5mZLU
+            "false": []
+        script-WHvM51XBW:
+            "true":
+                - script-IMkp5mZLU
+            "false": []
+        source:
+            "true":
+                - detector-CNH_LQq0l
+                - detector-5eEY77Vir
+            "false": []
+        tracking-QHlIvDGEU:
+            "true":
+                - script-WHvM51XBW
+            "false": []
+        tracking-wxz2xYpQD:
+            "true":
+                - script-QBMd7t1p5
+            "false": []
+      blocks:
+        detector-5eEY77Vir:
+            id: detector-5eEY77Vir
+            type: detector
+            data:
+                id: 1
+                type: detector
+            position:
+                x: -790
+                "y": 260
+            uuid:
+                - 84b1ab81-8c19-46a3-819e-728a0a22cb5b
+        detector-CNH_LQq0l:
+            id: detector-CNH_LQq0l
+            type: detector
+            data:
+                id: 12
+                type: detector
+            position:
+                x: -840
+                "y": -141
+            uuid:
+                - 41c7c64a-a765-4355-a8ab-a2ec7f85b281
+        filter-7RKUeVlJr:
+            id: filter-7RKUeVlJr
+            type: filter
+            data:
+                percentprob: "86"
+                type: filter
+                types:
+                    - person
+            position:
+                x: -580
+                "y": 260
+        filter-yEL71ACjQ:
+            id: filter-yEL71ACjQ
+            type: filter
+            data:
+                percentprob: "50"
+                type: filter
+            position:
+                x: -620
+                "y": -140
+        notify-zKhyWY8nw:
+            id: notify-zKhyWY8nw
+            type: notify
+            data:
+                interval: 10
+                notificationsid:
+                    - 3
+                    - 1
+                type: notify
+            position:
+                x: 300
+                "y": -200
+            uuid:
+                - af04d91c-bbcd-44c3-be9f-98a0ed5bda46
+                - 590b9e65-c726-41e4-8e4f-076a177c0888
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 509
+                "y": 20
+        script-IMkp5mZLU:
+            id: script-IMkp5mZLU
+            type: script
+            data:
+                id: 26
+                type: script
+            position:
+                x: 30
+                "y": 20
+            uuid:
+                - 784430bf-fb5d-442e-a597-a6a93872b0b6
+        script-QBMd7t1p5:
+            id: script-QBMd7t1p5
+            type: script
+            data:
+                id: 24
+                type: script
+            position:
+                x: -180
+                "y": 210
+            uuid:
+                - 32e57fc5-80cb-441f-8050-2a79d8485614
+        script-WHvM51XBW:
+            id: script-WHvM51XBW
+            type: script
+            data:
+                id: 18
+                type: script
+            position:
+                x: -150
+                "y": -220
+            uuid:
+                - 344e7d9c-0e37-4a25-8b63-ff190fd96fdf
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -1080
+                "y": 40
+        tracking-QHlIvDGEU:
+            id: tracking-QHlIvDGEU
+            type: tracking
+            data:
+                ghosts: false
+                scale: "1"
+                type: tracking
+            position:
+                x: -400
+                "y": -140
+        tracking-wxz2xYpQD:
+            id: tracking-wxz2xYpQD
+            type: tracking
+            data:
+                scale: "0.5"
+                type: tracking
+            position:
+                x: -380
+                "y": 260
+    - uuid: b0ef44dd-6fbd-43e8-8394-b98557785da1
+      name: PPE analytic
+      desc: 'checking helmet, vest, sleeve, boots, gloves '
+      enabled: false
+      framerate: 3
+      passhash: []
+      links:
+        crop-yWLfcbT66:
+            "true": []
+            "false": []
+        detector--ztORNB4n:
+            "true":
+                - script-n2SMvynTf
+            "false": []
+        detector-4mxENg4CQ:
+            "true":
+                - script-bXMhK2c0I
+            "false": []
+        detector-OFWS4lFBq:
+            "true":
+                - script-n2SMvynTf
+            "false": []
+        detector-TKuwg15BV:
+            "true":
+                - filter-Yd2dOByfM
+            "false": []
+        detector-jsgPNR99y:
+            "true":
+                - script-n2SMvynTf
+            "false": []
+        exceptions-0hzEUOv9r:
+            "true": []
+            "false": []
+        filter-Yd2dOByfM:
+            "true":
+                - region-w6_5DoJnE
+            "false": []
+        region-w6_5DoJnE:
+            "true":
+                - script-jU-h7Gnpw
+            "false": []
+        script-61x0QsmNl:
+            "true":
+                - detector-OFWS4lFBq
+                - detector--ztORNB4n
+                - detector-jsgPNR99y
+            "false": []
+        script-JKihVcjFf:
+            "true":
+                - script-Ta2p85Jxg
+            "false": []
+        script-Ta2p85Jxg:
+            "true":
+                - detector-4mxENg4CQ
+            "false": []
+        script-bXMhK2c0I:
+            "true":
+                - script-61x0QsmNl
+            "false": []
+        script-gLQVH2tmw:
+            "true":
+                - script-JKihVcjFf
+            "false": []
+        script-jU-h7Gnpw:
+            "true":
+                - tracking-6VdFULYnA
+            "false": []
+        script-n2SMvynTf:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-TKuwg15BV
+            "false": []
+        tracking-6VdFULYnA:
+            "true":
+                - script-gLQVH2tmw
+            "false": []
+      blocks:
+        crop-yWLfcbT66:
+            id: crop-yWLfcbT66
+            type: crop
+            data:
+                regionnames:
+                    - check_zone
+                type: crop
+            position:
+                x: -990
+                "y": -120
+        detector--ztORNB4n:
+            id: detector--ztORNB4n
+            type: detector
+            data:
+                id: 18
+                type: detector
+            position:
+                x: 1510
+                "y": 250
+            uuid:
+                - 4ad901f6-1c65-45c8-88be-7c424e8d1eb2
+        detector-4mxENg4CQ:
+            id: detector-4mxENg4CQ
+            type: detector
+            data:
+                id: 14
+                type: detector
+            position:
+                x: 930
+                "y": 100
+            uuid:
+                - 322c6c6d-ff33-4cc4-bb9e-cab108629cba
+        detector-OFWS4lFBq:
+            id: detector-OFWS4lFBq
+            type: detector
+            data:
+                id: 16
+                type: detector
+            position:
+                x: 1510
+                "y": 100
+            uuid:
+                - cf653e16-b1dc-44da-9635-e9f00f88b742
+        detector-TKuwg15BV:
+            id: detector-TKuwg15BV
+            type: detector
+            data:
+                id: 17
+                type: detector
+            position:
+                x: -990
+                "y": 80
+            uuid:
+                - 43adaef8-300d-4bcc-acdb-10b3b215079e
+        detector-jsgPNR99y:
+            id: detector-jsgPNR99y
+            type: detector
+            data:
+                id: 15
+                type: detector
+            position:
+                x: 1510
+                "y": 400
+            uuid:
+                - c05a1fbf-f2f1-449b-bb4a-d4ba714068e9
+        exceptions-0hzEUOv9r:
+            id: exceptions-0hzEUOv9r
+            type: exceptions
+            data:
+                threshold: "80"
+                type: exceptions
+            position:
+                x: 300
+                "y": -140
+        filter-Yd2dOByfM:
+            id: filter-Yd2dOByfM
+            type: filter
+            data:
+                percentprob: "70"
+                type: filter
+                types:
+                    - person
+                    - head
+            position:
+                x: -790
+                "y": 80
+        region-w6_5DoJnE:
+            id: region-w6_5DoJnE
+            type: region
+            data:
+                anchor: 0
+                regionnames:
+                    - check_zone
+                type: region
+            position:
+                x: -590
+                "y": 80
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 2190
+                "y": 100
+        script-61x0QsmNl:
+            id: script-61x0QsmNl
+            type: script
+            data:
+                id: 19
+                type: script
+                values:
+                    threshold: "0.5"
+            position:
+                x: 1290
+                "y": 99
+            uuid:
+                - d0d145e5-03f8-444b-a7a2-7b3d3d9ced6b
+        script-JKihVcjFf:
+            id: script-JKihVcjFf
+            type: script
+            data:
+                id: 18
+                type: script
+            position:
+                x: 510
+                "y": 100
+            uuid:
+                - 344e7d9c-0e37-4a25-8b63-ff190fd96fdf
+        script-Ta2p85Jxg:
+            id: script-Ta2p85Jxg
+            type: script
+            data:
+                id: 21
+                type: script
+            position:
+                x: 690
+                "y": 100
+            uuid:
+                - 3ecae5e7-de77-4c31-94cc-e8d6ca7d28d1
+        script-bXMhK2c0I:
+            id: script-bXMhK2c0I
+            type: script
+            data:
+                id: 22
+                type: script
+            position:
+                x: 1110
+                "y": 100
+            uuid:
+                - 14cc7743-286e-40d7-b4e3-2bc3d3a33f15
+        script-gLQVH2tmw:
+            id: script-gLQVH2tmw
+            type: script
+            data:
+                id: 23
+                type: script
+                values:
+                    head_scale_factor: "1.4"
+            position:
+                x: 330
+                "y": 100
+            uuid:
+                - dc9fdc6e-58b2-466f-8fcb-a0c55744e80f
+        script-jU-h7Gnpw:
+            id: script-jU-h7Gnpw
+            type: script
+            data:
+                id: 24
+                type: script
+            position:
+                x: -270
+                "y": -170
+            uuid:
+                - 32e57fc5-80cb-441f-8050-2a79d8485614
+        script-n2SMvynTf:
+            id: script-n2SMvynTf
+            type: script
+            data:
+                id: 20
+                type: script
+            position:
+                x: 1780
+                "y": 100
+            uuid:
+                - 2af13438-c1d2-412f-87ee-050d6ff396f0
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -1230
+                "y": 80
+        tracking-6VdFULYnA:
+            id: tracking-6VdFULYnA
+            type: tracking
+            data:
+                scale: "0.5"
+                type: tracking
+            position:
+                x: -60
+                "y": 99

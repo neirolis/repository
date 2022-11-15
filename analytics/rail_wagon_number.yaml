@@ -1,0 +1,198 @@
+type: ""
+name: КОКС
+desc: Распознавание номеров вагонов
+version: v0.0.1
+scripts:
+    - uuid: 32d72912-bbaa-42f2-8077-1a1c22fde644
+      name: cisterns_motion
+      enabled: false
+      source: "// cache для каждой камеры отдельно\r\nvar reported_numbers_cache = {}\r\nvar rm_last_update_periond_sec = 60.0\r\n// get_cache возвращает кеш для данной камеры, \r\n// если он ещё не инициализирован то создает его\r\n\r\nfunction get_reported_numbers_cache(frame) {\r\n  if (!reported_numbers_cache[frame.Camera.ID]) reported_numbers_cache[frame.Camera.ID] = {};\r\n  return reported_numbers_cache[frame.Camera.ID];\r\n}\r\n\r\n// check_number проверяет верно ли распознан номер путем сверки контрольной суммы\r\nfunction check_number(number_str) {\r\n  var int_digits = number_str.split('');\r\n  for (var i = 0; i < number_str.length; i++) {\r\n    int_digits[i] = parseInt(int_digits[i]);\r\n  }\r\n  var controle = [2, 1, 2, 1, 2, 1, 2]\r\n\r\n  var sum = 0;\r\n  var quotient = 0;\r\n  var remainder = 0;\r\n  for (var i = 0; i < 7; i++) {\r\n    quotient = (int_digits[i] * controle[i] - ((int_digits[i] * controle[i]) % 10)) / 10;\r\n    remainder = (int_digits[i] * controle[i]) % 10;\r\n    sum += quotient + remainder;\r\n  }\r\n\r\n  quotient = (sum - (sum % 10)) / 10;\r\n  var controle_digit = ((quotient + 1) * 10 - sum) % 10\r\n  return (controle_digit == int_digits[int_digits.length - 1]) ? true : false;\r\n}\r\n\r\nfunction main(frame) {\r\n  var reported_cache = get_reported_numbers_cache(frame);\r\n\r\n  for (var i in frame.Items) {\r\n    var item = frame.Items[i];\r\n    for (var j in item.Items){\r\n      var sub_item = item.Items[j];\r\n      if (sub_item.Type == \"platform_number\"){\r\n        item.Name = sub_item.Name\r\n        item.Prob = sub_item.Prob\r\n      }\r\n      item.Items = [];\r\n    }\r\n    var control_sum = check_number(item.Name)\r\n    rtmip.Debug(item.Name, \" \", item.Prob, \" \", control_sum);\r\n    \r\n    if (item.Prob > 0.9){\r\n      var already_reported = false\r\n      for (camera_id in reported_numbers_cache){\r\n        if (item.Name in reported_numbers_cache[camera_id] && frame.Time - reported_numbers_cache[camera_id][item.Name] < 120){\r\n          already_reported = true\r\n        }\r\n      }\r\n  \t\t// var event = rtmip.NewEvent(frame, cache[item.ID]);\r\n      if (!already_reported){\r\n        if (control_sum){\r\n          item.State = \"pass\"\r\n          reported_cache[item.Name] = frame.Time\r\n          frame.Save();\r\n          var event = rtmip.NewEvent(frame, item);\r\n      \t\trtmip.StoreEvent(event);\r\n          \r\n        }\r\n        else{\r\n          item.State = \"fail\"\r\n        }\r\n        \r\n      }\r\n    }\r\n    if (!item.Name || item.Prob < 0.80){\r\n      item.State = \"hide\";\r\n  \t\t// cache[number]['event'] = event;\r\n    }\r\n    \r\n  }\r\n\r\n  return true;\r\n}"
+    - uuid: e685fd68-a5d1-49bf-b111-93c732e94624
+      name: expand_1
+      enabled: false
+      source: "function main(frame) {\n  \n  for (var i in frame.Items) {\n    var item = frame.Items[i];\n    rtmip.Debug(item.BBox)\n    rtmip.Debug(item.ID)\n    item.BBox = item.BBox.Scale(1.3);\n  }\n  \n  return true\n}\n"
+detectors:
+    - uuid: 2c3efbbe-e17e-44bb-80ee-68403a9a1516
+      name: containers_numbers
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:43010
+      cmd: ""
+    - uuid: cf871dcb-5479-4da7-8b88-840fec0f86d0
+      name: cistern_numb_detector
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:3334
+      cmd: ""
+analytics:
+    - uuid: 92a76bc6-0732-4d5f-a186-4549febec37a
+      name: Распознавание номеров вагонов КОКС
+      enabled: true
+      framerate: 15
+      passhash: []
+      links:
+        crop-7cn5-zzfN:
+            "true":
+                - detector-RLW9SVjOY
+            "false": []
+        detector-2piavTGMo:
+            "true":
+                - script-ttstcgJZl
+            "false": []
+        detector-RLW9SVjOY:
+            "true":
+                - filter-92nPTUiMd
+            "false": []
+        filter-92nPTUiMd:
+            "true":
+                - tracking-K7D09BAcG
+            "false": []
+        filter-UzKtDc5sa:
+            "true":
+                - result
+            "false": []
+        region-EB_dA1rqn:
+            "true":
+                - script-mjuj7MlE3
+            "false": []
+        script-mjuj7MlE3:
+            "true":
+                - detector-2piavTGMo
+            "false": []
+        script-ttstcgJZl:
+            "true":
+                - filter-UzKtDc5sa
+            "false": []
+        source:
+            "true":
+                - crop-7cn5-zzfN
+            "false": []
+        tracking-K7D09BAcG:
+            "true":
+                - region-EB_dA1rqn
+            "false": []
+      blocks:
+        crop-7cn5-zzfN:
+            id: crop-7cn5-zzfN
+            type: crop
+            data:
+                regionnames:
+                    - cam_3
+                    - "111"
+                type: crop
+            position:
+                x: -120
+                "y": 80
+            active: true
+        detector-2piavTGMo:
+            id: detector-2piavTGMo
+            type: detector
+            data:
+                id: 15
+                type: detector
+            position:
+                x: 1120
+                "y": 80
+            uuid:
+                - 2c3efbbe-e17e-44bb-80ee-68403a9a1516
+            active: true
+        detector-RLW9SVjOY:
+            id: detector-RLW9SVjOY
+            type: detector
+            data:
+                id: 16
+                type: detector
+            position:
+                x: 90
+                "y": 80
+            uuid:
+                - cf871dcb-5479-4da7-8b88-840fec0f86d0
+            active: true
+        filter-92nPTUiMd:
+            id: filter-92nPTUiMd
+            type: filter
+            data:
+                percentprob: "1"
+                type: filter
+                types:
+                    - NM
+            position:
+                x: 300
+                "y": 80
+            active: true
+        filter-UzKtDc5sa:
+            id: filter-UzKtDc5sa
+            type: filter
+            data:
+                percentprob: "80"
+                type: filter
+            position:
+                x: 1530
+                "y": 0
+            active: true
+        region-EB_dA1rqn:
+            id: region-EB_dA1rqn
+            type: region
+            data:
+                anchor: 5
+                regionnames:
+                    - new
+                type: region
+            position:
+                x: 710
+                "y": 80
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1720
+                "y": 30
+            active: true
+        script-mjuj7MlE3:
+            id: script-mjuj7MlE3
+            type: script
+            data:
+                id: 62
+                type: script
+            position:
+                x: 910
+                "y": 60
+            uuid:
+                - e685fd68-a5d1-49bf-b111-93c732e94624
+            active: true
+        script-ttstcgJZl:
+            id: script-ttstcgJZl
+            type: script
+            data:
+                id: 25
+                type: script
+            position:
+                x: 1320
+                "y": 60
+            uuid:
+                - 32d72912-bbaa-42f2-8077-1a1c22fde644
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -330
+                "y": 80
+            active: true
+        tracking-K7D09BAcG:
+            id: tracking-K7D09BAcG
+            type: tracking
+            data:
+                scale: "2"
+                type: tracking
+            position:
+                x: 510
+                "y": 80
+            active: true

@@ -1,0 +1,434 @@
+type: ""
+name: NGU
+version: v0.0.1
+auth: ""
+authheader: ""
+scripts:
+    - uuid: 9e28727e-0f13-4c1c-b64d-d61a09039703
+      name: ngu_head_pose_check_old
+      source: "// script created at 22:34:30 Feb 16\nvar reports_period = 30.\nvar reports_with_image_period = 600.\nvar minimal_faces_in_frame = 5\n\nvar camcache = {}\n\nfunction getCache(frame) {\n  // Need to create global var cache = {}\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {\"last_report\": 0.0, \"last_report_with_image\": 0.0}\n\t\tcamcache[frame.Camera.ID] = cache\n\t}\n\treturn cache\n}\n\n\nfunction main(frame) {\n\tvar cache = getCache(frame);\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tvar pitch\n\t\tvar yaw\n\t\tfor (var j in item.Items){\n\t\t  var subitem = item.Items[j]\n\t\t  if(subitem.Type == \"pitch\"){\n\t\t    pitch = parseFloat(subitem.Name)\n\t\t  }\n\t\t  if(subitem.Type == \"yaw\"){\n\t\t    yaw = parseFloat(subitem.Name)\n\t\t  }\n\t\t}\n\t\t// rtmip.Debugf(\"%+v  %+v\", pitch, yaw)\n\t\tif (pitch && yaw && pitch > -0.25 && pitch < 0.50 && yaw > -1.1 && yaw < 1.1){\n\t\t  item.State = \"pass\"\n\t\t  item.Type = \"attentive\"\n\t\t}\n\t\telse{\n\t\t  item.State = \"fail\"\n\t\t  item.Type = \"distracted\"\n\t\t}\n\t}\n\t\n\tif (frame.Items.length > minimal_faces_in_frame && frame.Time - cache[\"last_report\"] > reports_period){\n\t  cache[\"last_report\"] = frame.Time\n\t  if (frame.Time - cache[\"last_report_with_image\"] > reports_with_image_period){ \n\t    frame.Save()\n\t    cache[\"last_report_with_image\"] = frame.Time\n\t  }\n\t  var event = rtmip.NewEmptyEvent(frame)\n\t  event.Items = frame.Items\n\t  rtmip.StoreEvent(event)\n\t}\n\treturn true\n}"
+    - uuid: 0d16cae7-63d3-48b6-bc45-31fb024f439e
+      name: ngu_check_head_pose
+      source: "// script created at 22:34:30 Feb 16\nvar reports_period = 10.\nvar reports_with_image_period = 10.\nvar minimal_faces_in_frame = 5\n\nvar camcache = {}\n\nfunction getCache(frame) {\n  // Need to create global var cache = {}\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {\"last_report\": 0.0, \"last_report_with_image\": 0.0}\n\t\tcamcache[frame.Camera.ID] = cache\n\t}\n\treturn cache\n}\n\nfunction regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh) {\n\tif (pitch && yaw && pitch > pitch_down_min && pitch < 0.50 && yaw > yaw_att_min && yaw < yaw_att_max){\n\t  item.State = \"pass\"\n\t  item.Type = \"attentive\"\n\t}\n\telse if ((pitch && yaw && pitch <= pitch_down_min && yaw > yaw_att_min && yaw < yaw_att_max) || yaw < yaw_face_down_min_thresh || yaw > yaw_face_down_max_thresh) {\n\t  item.State = \"fail\"\n\t  item.Type = \"face down\"\n\t}\n\telse{\n\t  item.State = \"fail\"\n\t  item.Type = \"distracted\"\n\t}\n\treturn item\n}\n\nvar yaw_interval = 0.7\nvar face_down_thresh = 1.2\n\nfunction reg0Check(item, yaw, pitch) {\n  var pitch_down_min = -0.9\n  var yaw_att_min = -yaw_interval\n  var yaw_att_max = yaw_interval\n  var yaw_face_down_max_thresh = face_down_thresh\n  var yaw_face_down_min_thresh = -face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg1Check(item, yaw, pitch) {\n  var pitch_down_min = -0.6\n  var yaw_att_min = -yaw_interval\n  var yaw_att_max = yaw_interval\n  var yaw_face_down_max_thresh = face_down_thresh\n  var yaw_face_down_min_thresh = -face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg2Check(item, yaw, pitch) {\n  var pitch_down_min = -0.45\n  var yaw_att_min = -yaw_interval\n  var yaw_att_max = yaw_interval\n  var yaw_face_down_max_thresh = face_down_thresh\n  var yaw_face_down_min_thresh = -face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg3Check(item, yaw, pitch) {\n  var pitch_down_min = -0.9\n  var yaw_att_min = 0.3 - yaw_interval\n  var yaw_att_max = 0.3 + yaw_interval\n  var yaw_face_down_max_thresh = 0.3 + face_down_thresh\n  var yaw_face_down_min_thresh = 0.3 - face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg4Check(item, yaw, pitch) {\n  var pitch_down_min = -0.6\n  var yaw_att_min = 0.2 - yaw_interval\n  var yaw_att_max = 0.2 + yaw_interval\n  var yaw_face_down_max_thresh = 0.2 + face_down_thresh\n  var yaw_face_down_min_thresh = 0.2 - face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg5Check(item, yaw, pitch) {\n  var pitch_down_min = -0.45\n  var yaw_att_min = -yaw_interval\n  var yaw_att_max = yaw_interval\n  var yaw_face_down_max_thresh = face_down_thresh\n  var yaw_face_down_min_thresh = -face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg6Check(item, yaw, pitch) {\n  var pitch_down_min = -0.9\n  var yaw_att_min = -0.35 - yaw_interval\n  var yaw_att_max = -0.35 + yaw_interval\n  var yaw_face_down_max_thresh = -0.35 + face_down_thresh\n  var yaw_face_down_min_thresh = -0.35 - face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg7Check(item, yaw, pitch) {\n  var pitch_down_min = -0.6\n  var yaw_att_min = -0.2 - yaw_interval\n  var yaw_att_max = -0.2 + yaw_interval\n  var yaw_face_down_max_thresh = -0.2 + face_down_thresh\n  var yaw_face_down_min_thresh = -0.2 - face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction reg8Check(item, yaw, pitch) {\n  var pitch_down_min = -0.45\n  var yaw_att_min = -yaw_interval\n  var yaw_att_max = yaw_interval\n  var yaw_face_down_max_thresh = face_down_thresh\n  var yaw_face_down_min_thresh = -face_down_thresh\n  item = regCheck(item, pitch, yaw, pitch_down_min, yaw_att_min, yaw_att_max, yaw_face_down_min_thresh, yaw_face_down_max_thresh)\n\treturn item\n}\n\nfunction main(frame) {\n\tvar cache = getCache(frame);\n\tvar reg0 = rtmip.GetCameraRegion(frame, \"reg0\")\n\tvar reg1 = rtmip.GetCameraRegion(frame, \"reg1\")\n\tvar reg2 = rtmip.GetCameraRegion(frame, \"reg2\")\n\tvar reg3 = rtmip.GetCameraRegion(frame, \"reg3\")\n\tvar reg4 = rtmip.GetCameraRegion(frame, \"reg4\")\n\tvar reg5 = rtmip.GetCameraRegion(frame, \"reg5\")\n\tvar reg6 = rtmip.GetCameraRegion(frame, \"reg6\")\n\tvar reg7 = rtmip.GetCameraRegion(frame, \"reg7\")\n\tvar reg8 = rtmip.GetCameraRegion(frame, \"reg8\")\n\t\n\tvar update_items = []\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tvar pitch\n\t\tvar yaw\n\t\tfor (var j in item.Items){\n\t\t  var subitem = item.Items[j]\n\t\t  if(subitem.Type == \"pitch\"){\n\t\t    pitch = parseFloat(subitem.Name)\n\t\t  }\n\t\t  if(subitem.Type == \"yaw\"){\n\t\t    yaw = parseFloat(subitem.Name)\n\t\t  }\n\t\t}\n\t\titem.BBox = item.BBox.Scale(0.05)\n\t\t\n\t\t// rtmip.Debugf(\"%+v  %+v\", pitch, yaw)\n\t\tif (reg0 && reg0.ContainsCoords(item.BBox)) {\n\t\t  item = reg0Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\telse if (reg1 && reg1.ContainsCoords(item.BBox)) {\n\t\t  item = reg1Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\telse if (reg2 && reg2.ContainsCoords(item.BBox)) {\n\t\t  item = reg2Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\telse if (reg3 && reg3.ContainsCoords(item.BBox)) {\n\t\t  item = reg3Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\telse if (reg4 && reg4.ContainsCoords(item.BBox)) {\n\t\t  item = reg4Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\telse if (reg5 && reg5.ContainsCoords(item.BBox)) {\n\t\t  item = reg5Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\telse if (reg6 && reg6.ContainsCoords(item.BBox)) {\n\t\t  item = reg6Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\telse if (reg7 && reg7.ContainsCoords(item.BBox)) {\n\t\t  item = reg7Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t  else if (reg8 && reg8.ContainsCoords(item.BBox)) {\n\t\t  item = reg8Check(item, yaw, pitch)\n\t\t  update_items.push(item)\n\t\t}\n\t\t//item.Items = []\n\t}\n\titems = update_items\n\tfor (var i in items) {\n\t  items[i].BBox = items[i].BBox.Scale(20)\n\t}\n\t\n\tif (frame.Items.length > minimal_faces_in_frame && frame.Time - cache[\"last_report\"] > reports_period){\n\t  cache[\"last_report\"] = frame.Time\n\t  if (frame.Time - cache[\"last_report_with_image\"] > reports_with_image_period){ \n\t    frame.Save()\n\t    cache[\"last_report_with_image\"] = frame.Time\n\t  }\n\t  var event = rtmip.NewEmptyEvent(frame)\n\t  //event.Items = frame.Items\n\t  event.Items = items\n\t  rtmip.StoreEvent(event)\n\t}\n\treturn true\n}"
+detectors:
+    - uuid: e1c5c7ed-dd33-4243-8c95-23a8c0d212ec
+      name: person_head_detector
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: e1c5c7ed-dd33-4243-8c95-23a8c0d212ec
+      name: person_head_detector
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: 7bfcc636-5798-4e12-8c34-ae1aedea44e1
+      name: head_pose_classifier
+      type: items
+      addrs:
+        - 127.0.0.1:65311
+      status:
+        version: "1.4"
+        name: head-pose-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        output:
+            types:
+                - birdview
+                - fullface
+                - backview
+                - profile
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+    - uuid: 7bfcc636-5798-4e12-8c34-ae1aedea44e1
+      name: head_pose_classifier
+      type: items
+      addrs:
+        - 127.0.0.1:65311
+      status:
+        version: "1.4"
+        name: head-pose-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        output:
+            types:
+                - birdview
+                - fullface
+                - backview
+                - profile
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+    - uuid: e1c5c7ed-dd33-4243-8c95-23a8c0d212ec
+      name: person_head_detector
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+analytics:
+    - uuid: 2bc926c9-1abe-44ad-8379-01124f667a6d
+      name: Alarm
+      framerate: 1
+      passhash: []
+      links:
+        detector-B48FIV4Mz:
+            "true":
+                - filter-lzYUol9EB
+            "false": []
+        filter-lzYUol9EB:
+            "true":
+                - event-3xZ7PVogG
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-B48FIV4Mz
+            "false": []
+      blocks:
+        detector-B48FIV4Mz:
+            id: detector-B48FIV4Mz
+            type: detector
+            data:
+                id: 1
+                type: detector
+            position:
+                x: -240
+                "y": 100
+            uuid:
+                - e1c5c7ed-dd33-4243-8c95-23a8c0d212ec
+        event-3xZ7PVogG:
+            id: event-3xZ7PVogG
+            type: event
+            data:
+                interval: 10
+                saveframe: true
+                type: event
+            position:
+                x: 670
+                "y": -120
+        filter-lzYUol9EB:
+            id: filter-lzYUol9EB
+            type: filter
+            data:
+                percentprob: "70"
+                type: filter
+                types:
+                    - head
+            position:
+                x: 100
+                "y": 100
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 700
+                "y": 100
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -490
+                "y": 100
+    - uuid: 8143be73-d9bd-470e-8247-913cc1b13393
+      name: Head Pose old
+      framerate: 1
+      passhash: []
+      links:
+        detector-1uG7MoXGo:
+            "true":
+                - filter-QH1AVpLf2
+            "false": []
+        detector-hHBx9Meo6:
+            "true":
+                - script-ZDQBm1Dfi
+            "false": []
+        filter-QH1AVpLf2:
+            "true":
+                - detector-hHBx9Meo6
+            "false": []
+        script-ZDQBm1Dfi:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-1uG7MoXGo
+            "false": []
+      blocks:
+        detector-1uG7MoXGo:
+            id: detector-1uG7MoXGo
+            type: detector
+            data:
+                id: 1
+                type: detector
+            position:
+                x: -70
+                "y": 60
+            uuid:
+                - e1c5c7ed-dd33-4243-8c95-23a8c0d212ec
+        detector-hHBx9Meo6:
+            id: detector-hHBx9Meo6
+            type: detector
+            data:
+                id: 2
+                type: detector
+            position:
+                x: 400
+                "y": 60
+            uuid:
+                - 7bfcc636-5798-4e12-8c34-ae1aedea44e1
+        filter-QH1AVpLf2:
+            id: filter-QH1AVpLf2
+            type: filter
+            data:
+                percentprob: "50"
+                type: filter
+                types:
+                    - head
+            position:
+                x: 170
+                "y": 60
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 980
+                "y": 60
+        script-ZDQBm1Dfi:
+            id: script-ZDQBm1Dfi
+            type: script
+            data:
+                id: 1
+                type: script
+            position:
+                x: 650
+                "y": 60
+            uuid:
+                - 9e28727e-0f13-4c1c-b64d-d61a09039703
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -310
+                "y": 60
+    - uuid: a76b6361-f67e-4ff8-8a55-b504ac5b41a9
+      name: Head Pose
+      framerate: 1
+      passhash: []
+      links:
+        Scale Bbox-GcGuxRmLc:
+            "true":
+                - detector-ADxMmUPt6
+            "false": []
+        detector-ADxMmUPt6:
+            "true":
+                - script-JMpiOi67c
+            "false": []
+        detector-MWMgo8mNR:
+            "true":
+                - filter-G0EtZnmlT
+            "false": []
+        filter-G0EtZnmlT:
+            "true":
+                - Scale Bbox-GcGuxRmLc
+            "false": []
+        script-JMpiOi67c:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-MWMgo8mNR
+            "false": []
+      blocks:
+        Scale Bbox-GcGuxRmLc:
+            id: Scale Bbox-GcGuxRmLc
+            type: extscript
+            data:
+                desc: Expand bboxes by scale
+                error: null
+                exec: ./expand_bboxes
+                icon: expand.png
+                id: expand_bbox
+                name: Scale Bbox
+                type: extscript
+                values:
+                    sb: false
+                    sh: "1.3"
+                    sw: "1.3"
+                variables:
+                    - class: ""
+                      data: null
+                      default: 1
+                      desc: ""
+                      label: Scale of widht
+                      name: sw
+                      readonly: false
+                      required: false
+                      selected: false
+                      system: false
+                      type: ""
+                      value: null
+                      width: 0
+                    - class: ""
+                      data: null
+                      default: 1
+                      desc: ""
+                      label: Scale of height
+                      name: sh
+                      readonly: false
+                      required: false
+                      selected: false
+                      system: false
+                      type: ""
+                      value: null
+                      width: 0
+                    - class: ""
+                      data: null
+                      default: false
+                      desc: if true Scale Height = Scale Widht
+                      label: Scale both
+                      name: sb
+                      readonly: false
+                      required: false
+                      selected: false
+                      system: false
+                      type: checkbox
+                      value: null
+                      width: 0
+            position:
+                x: 170
+                "y": 30
+        detector-ADxMmUPt6:
+            id: detector-ADxMmUPt6
+            type: detector
+            data:
+                id: 2
+                type: detector
+            position:
+                x: 370
+                "y": 60
+            uuid:
+                - 7bfcc636-5798-4e12-8c34-ae1aedea44e1
+        detector-MWMgo8mNR:
+            id: detector-MWMgo8mNR
+            type: detector
+            data:
+                id: 1
+                type: detector
+            position:
+                x: -210
+                "y": 70
+            uuid:
+                - e1c5c7ed-dd33-4243-8c95-23a8c0d212ec
+        filter-G0EtZnmlT:
+            id: filter-G0EtZnmlT
+            type: filter
+            data:
+                percentprob: "50"
+                type: filter
+                types:
+                    - head
+            position:
+                x: -20
+                "y": 70
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 770
+                "y": 70
+        script-JMpiOi67c:
+            id: script-JMpiOi67c
+            type: script
+            data:
+                id: 2
+                type: script
+            position:
+                x: 570
+                "y": 70
+            uuid:
+                - 0d16cae7-63d3-48b6-bc45-31fb024f439e
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -400
+                "y": 70

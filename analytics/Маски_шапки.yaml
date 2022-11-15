@@ -1,0 +1,273 @@
+type: analytics
+name: Маски\шапки
+scripts:
+    - uuid: 6582c169-f4d9-4c14-b032-f6e6150de86c
+      name: check_masks
+      enabled: false
+      source: "// script created at 14:49:12 сент. 12\n\nvar mask = \"mask\"\nvar no_hat = \"empty\"\n\nvar reportPeriodSec = 5.0\n\nvar camcache = {}\n\nfunction createEvent(frame, item, eventStatus) {\n  frame.Save()\n  var event = rtmip.NewEvent(frame, item)\n  event.Status = typeof eventStatus == \"undefined\" ? item.Name : eventStatus\n  event.State = item.State\n  rtmip.StoreEvent(event)\n}\n\nfunction getCache(frame) {\n  var cache = camcache[frame.Camera.ID]\n  if (!cache) {\n    cache = {}\n    camcache[frame.Camera.ID] = {}\n  }\n  return cache\n}\n\nfunction get_mouth_info(item) {\n  var mouth = item.Items.LookupItemByType(\"mouth\")\n  return mouth\n}\n\nfunction get_head_info(item) {\n  var head = item.Items.LookupItemByType(\"headtop\")\n  return head\n}\n\nfunction main(frame) {\n  \n  var current_timestamp = Math.round((new Date()).getTime() / 1000)\n  var cache = getCache(frame);\n  var need_report = false\n  \n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tvar c = cache[item.ID]\n\t\tvar mouth = get_mouth_info(item)\n\t\tvar head = get_head_info(item)\n\t\t\n\t\tif (!c) {\n\t\t  c = {}\n\t  \tif (mouth) {\n\t\t    if (mouth.prob > 0.5) {\n\t\t      c[\"mouth\"] = mouth.name\n\t\t      c[\"mouth_prob\"] = mouth.prob\n\t\t      if (mouth.name == mask) {\n\t\t        item.State = \"pass\"\n\t\t      } else {\n            item.State = \"fail\"\n            c[\"report\"] = true\n\t\t        need_report = true\n\t\t      }\n\t      }\n  \t  }\n\t  \tif (head) {\n\t\t    if (head.prob > 0.5) {\n\t\t      c[\"head\"] = head.name\n\t\t      c[\"head_prob\"] = head.prob\n\t\t      if ((head.name != no_hat) && (head.name != \"hair\")) {\n\t\t        item.State = \"pass\"\n\t\t      } else {\n            item.State = \"fail\"\n            c[\"report\"] = true\n\t\t        need_report = true\n\t\t      }\n\t      }\n  \t  }\n  \t  \n\t\t} \n\t\telse {\n  \t\tif (mouth) {\n  \t\t  if (mouth.prob > c[\"mouth_prob\"]) {\n  \t\t    c[\"mouth\"] = mouth.name\n\t\t      c[\"mouth_prob\"] = mouth.prob\n  \t\t    if (mouth.name == mask) {\n  \t\t      item.State = \"pass\"\n  \t\t    } \n  \t\t    else {\n  \t\t      if (!c[\"report\"]) {\n    \t\t      item.State = \"fail\"\n    \t\t      need_report = true\n  \t\t      }\n  \t\t    }\n  \t\t  }\n  \t\t}\n  \t\tif (head) {\n  \t\t  if (head.prob > c[\"head_prob\"]) {\n  \t\t    c[\"head\"] = head.name\n\t\t      c[\"head_prob\"] = head.prob\n  \t\t    if ((head.name != no_hat) && (head.name != \"hair\")) {\n  \t\t      item.State = \"pass\"\n  \t\t    } \n  \t\t    else {\n  \t\t      if (!c[\"report\"]) {\n    \t\t      item.State = \"fail\"\n    \t\t      need_report = true\n  \t\t      }\n  \t\t  }\n  \t\t}\n\t  }\n\t\n  }\n  \n}\nreturn need_report\n}"
+    - uuid: d521c8c4-9471-48e3-a46a-7bf234ff9787
+      name: scale
+      enabled: false
+      source: |-
+        // script created at 11:37:49 сент. 13
+        function main(frame) {
+          for (var i in frame.Items) {
+           var item = frame.Items[i];
+           item.BBox = item.BBox.Scale(1.4);
+          }
+        return true;
+        }
+    - uuid: a0da449d-0f0e-4f2e-9b47-db5ada67a2c4
+      name: resize_head
+      enabled: false
+      source: "// script created at 23:40:23 сент. 20\nfunction main(frame) {\n  \n  filtered_items = []\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tif (item.Type == \"head\") {\n\t\t  var x = item.BBox.X()\n\t\t  var y = item.BBox.Y()\n\t\t  var w = item.BBox.W()\n\t\t  var h = item.BBox.H()\n\t\t  // make bbox smaller by Y\n\t\t  var delta = 0.3\n\t\t  y = y + delta * h\n\t\t  h = (1.0 - delta) * h\n\t\t  // make bbox sqared\n\t\t  x = x + w/2.\n\t\t  y = y + h/2.\n\t\t  var new_size = Math.max(w*frame.Info.Width, h*frame.Info.Height)\n\t\t  var new_w = new_size / frame.Info.Width\n\t\t  var new_h = new_size / frame.Info.Height\n\t\t  x = Math.max(0.0, x - new_w/2.)\n\t\t  y = Math.max(0.0, y - new_h/2.)\n\t\t  item.BBox = rtmip.NewBBox(x, y, new_w, new_h)\n\t\t  //item.BBox = item.BBox.Scale(0.9);\n\t\t  filtered_items.push(item)\n\t\t}\n\t}\n\tframe.Items = filtered_items\n\t\n\treturn true\n}"
+    - uuid: 5a0326fc-00a5-4b02-97b6-5f3dedd6908e
+      name: Face quality filer
+      enabled: false
+      source: "// script created at 11:11:58 сент. 23\\\n\n// view : [\"fullface\", \"profile\", \"birdview\", \"backview\", \"facepart\", \"distractor\", \"trash\"] onehot\n// quality : [\"empty\", \"blur\", \"scale\", \"overlap\", \"expression\", \"badlight\"] many\n\nviews_filter = {\n  \"fullface\": {\"threshold\": 0.6},\n  // \"profile\": {\"threshold\": 0.8},\n  // \"birdview\": {\"threshold\": 0.5},\n  // \"backview\": {\"threshold\": 0.5},\n  \"facepart\": {\"threshold\": 0.6},\n  // \"distractor\": {\"threshold\": 0.5},\n  // \"trash\": {\"threshold\": 0.5}\n}\n\n\nquality_filter = {\n  \"empty\": {\"threshold\": 0.3},\n  \"blur\": {\"threshold\": 0.3},\n  \"scale\": {\"threshold\": 0.3},\n  // \"overlap\": {\"threshold\": 0.5},\n  // \"expression\": {\"threshold\": 0.5},\n  \"badlight\": {\"threshold\": 0.3}\n}\n\n\nfunction main(frame) {\n\n  newitems = []\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\n\t\tfor (ii in item.Items) {\n\t\t  subitem = item.Items[ii]\n\t\t  // rtmip.Debugf(\"%+v\", subitem)\n\t\t  if (subitem.Name in views_filter) {\n\t\t    \n\t\t      if (subitem.Prob < views_filter[subitem.Name][\"threshold\"]) {continue}\n\n  \t\t    for (iii in subitem.Items) {\n  \t\t      subitem2 = subitem.Items[iii]\n  \t\t      // rtmip.Debugf(\"%+v\", subitem2)\n  \t\t      if (subitem2.Name in quality_filter) {\n  \t\t        if (subitem2.Prob < quality_filter[subitem2.Name][\"threshold\"]) {continue}\n  \t\t        newitems.push(item)\n  \t\t        \n  \t\t      }\n  \t\t    }\n\n\t\t  }\n\n\t\t}\n\n\t}\n\n\tframe.Items = newitems\n// \trtmip.Debugf(\"%+v\", frame.Items)\n\t\n\treturn true\n}"
+detectors:
+    - uuid: f589695e-0c50-464e-85ee-f601b166ea9d
+      name: nrls_face-quality-classifier-tf2
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65129
+      status:
+        version: "1.4"
+        name: face-quality-classifier-tf2
+        type: classifier
+        path: /cvpredict
+        input:
+            - face
+        imagetypes:
+            - ALL
+        width: 224
+        height: 224
+      params:
+        InputTypes: head
+      cmd: ""
+    - uuid: 43a6eead-7d77-4359-904b-ed27b1cf7859
+      name: nrls_head-classifier-tf1
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65325
+      status:
+        version: "1.4"
+        name: head-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        imagetypes:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+    - uuid: e78da2e1-bc0a-4318-9687-3fa481672b08
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+        - 127.0.0.1:65531
+        - 127.0.0.1:65532
+        - 127.0.0.1:65533
+      status:
+        version: "1.4"
+        name: person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+            colors: []
+            attributes: []
+        imagetypes:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+analytics:
+    - uuid: 6e700fa1-a7e5-49c5-9c8a-d1b8a01f11cb
+      name: Маски\шапки
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-GiE0QUzG_:
+            "true":
+                - script-Uc79-XWte
+            "false": []
+        detector-bMY4B-llg:
+            "true":
+                - script--n_0QqrHP
+            "false": []
+        detector-tX2-bCtuh:
+            "true":
+                - filter-PGX_svzBr
+            "false": []
+        filter-PGX_svzBr:
+            "true":
+                - script-OqMBte29T
+            "false": []
+        script--n_0QqrHP:
+            "true":
+                - event-B3G-fVySS
+                - result
+            "false":
+                - result
+        script-7-gQ-Pq18:
+            "true":
+                - detector-bMY4B-llg
+            "false": []
+        script-OqMBte29T:
+            "true":
+                - tracking-5YniHY_VK
+            "false": []
+        script-Uc79-XWte:
+            "true":
+                - script-7-gQ-Pq18
+            "false": []
+        source:
+            "true":
+                - detector-tX2-bCtuh
+            "false": []
+        tracking-5YniHY_VK:
+            "true":
+                - detector-GiE0QUzG_
+            "false": []
+      blocks:
+        detector-GiE0QUzG_:
+            id: detector-GiE0QUzG_
+            type: detector
+            data:
+                id: 17
+                type: detector
+            position:
+                x: 320
+                "y": 110
+            uuid:
+                - f589695e-0c50-464e-85ee-f601b166ea9d
+            active: true
+        detector-bMY4B-llg:
+            id: detector-bMY4B-llg
+            type: detector
+            data:
+                id: 16
+            position:
+                x: 940
+                "y": 110
+            uuid:
+                - 43a6eead-7d77-4359-904b-ed27b1cf7859
+            active: true
+        detector-tX2-bCtuh:
+            id: detector-tX2-bCtuh
+            type: detector
+            data:
+                id: 2
+                type: detector
+            position:
+                x: -440
+                "y": 110
+            uuid:
+                - e78da2e1-bc0a-4318-9687-3fa481672b08
+            active: true
+        event-B3G-fVySS:
+            id: event-B3G-fVySS
+            type: event
+            data:
+                interval: "1"
+                saveframe: true
+            position:
+                x: 1380
+                "y": -100
+            active: true
+        filter-PGX_svzBr:
+            id: filter-PGX_svzBr
+            type: filter
+            data:
+                percentprob: "60"
+                type: filter
+                types:
+                    - person
+                    - head
+            position:
+                x: -250
+                "y": 110
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1410
+                "y": 120
+            active: true
+        script--n_0QqrHP:
+            id: script--n_0QqrHP
+            type: script
+            data:
+                id: 14
+            position:
+                x: 1150
+                "y": 110
+            uuid:
+                - 6582c169-f4d9-4c14-b032-f6e6150de86c
+            active: true
+        script-7-gQ-Pq18:
+            id: script-7-gQ-Pq18
+            type: script
+            data:
+                id: 15
+            position:
+                x: 720
+                "y": 110
+            uuid:
+                - d521c8c4-9471-48e3-a46a-7bf234ff9787
+            active: true
+        script-OqMBte29T:
+            id: script-OqMBte29T
+            type: script
+            data:
+                id: 16
+                type: script
+            position:
+                x: -60
+                "y": 110
+            uuid:
+                - a0da449d-0f0e-4f2e-9b47-db5ada67a2c4
+            active: true
+        script-Uc79-XWte:
+            id: script-Uc79-XWte
+            type: script
+            data:
+                id: 18
+                type: script
+            position:
+                x: 530
+                "y": 110
+            uuid:
+                - 5a0326fc-00a5-4b02-97b6-5f3dedd6908e
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -630
+                "y": 110
+            active: true
+        tracking-5YniHY_VK:
+            id: tracking-5YniHY_VK
+            type: tracking
+            data:
+                scale: 2
+                type: tracking
+            position:
+                x: 130
+                "y": 110
+            active: true
