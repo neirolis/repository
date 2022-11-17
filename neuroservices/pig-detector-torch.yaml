@@ -1,7 +1,7 @@
 name: nrls_pig-detector-torch
 desc: HTTP Neural Network Service pig-detector-torch
 version: 1.4
-source: http://93.90.41.132:25000/pig-detector-torch.tar.gz
+source: http://176.195.55.27:25000/pig-detector-torch.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/pig-detector-torch/install_and_start.sh
