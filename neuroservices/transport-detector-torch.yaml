@@ -1,7 +1,7 @@
 name: nrls_transport-detector-torch
 desc: HTTP Neural Network Service transport-detector-torch
 version: 1.4
-source: http://176.195.55.27:25000/transport-detector-torch.tar.gz
+source: http://ec2-34-244-53-10.eu-west-1.compute.amazonaws.com:25000/transport-detector-torch.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/transport-detector-torch/install_and_start.sh

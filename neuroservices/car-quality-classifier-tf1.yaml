@@ -1,7 +1,7 @@
 name: nrls_car-quality-classifier-tf1
 desc: HTTP Neural Network Service car-quality-classifier-tf1
 version: 1.4
-source: http://176.195.55.27:25000/car-quality-classifier-tf1.tar.gz
+source: http://ec2-34-244-53-10.eu-west-1.compute.amazonaws.com:25000/car-quality-classifier-tf1.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/car-quality-classifier-tf1/install_and_start.sh
