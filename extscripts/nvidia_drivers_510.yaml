@@ -4,6 +4,6 @@ version: 0.99
 source: https://github.com/workingforfood/rtmip_open_repo/raw/main/nvidia_drivers_510.zip
 depends: nvidia_apt_repo
 exec:
-  - ./$PKGDIR/nvidia_drivers_510/install.sh
+  - ./$PKGDIR/install.sh
 
 need_restart: false
