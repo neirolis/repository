@@ -8,4 +8,6 @@ exec:
   - apt install -y cuda-toolkit-11-1
   - apt install -y libcudnn8=8.0.5.39-1+cuda11.1
   - apt install -y libcudnn8-dev=8.0.5.39-1+cuda11.1
+  - echo "export PATH=/usr/local/cuda-11.1/bin:${PATH}" >> /root/.bashrc
+  - echo "export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda-11.1/lib64" >> /root/.bashrc
 need_restart: false
