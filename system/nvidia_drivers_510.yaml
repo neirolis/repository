@@ -1,10 +1,9 @@
 name: nvidia_drivers_510
 desc: Install Nvidia 510 driver. Attention! ONLY MANUAL UNINSTALLATION
 version: 0.99
-source: https://github.com/workingforfood/rtmip_open_repo/raw/main/nvidia_drivers_510.zip
-depends:
-  - nvidia_apt_repo
+depends: nvidia_apt_repo
 exec:
-  - ./$PKGDIR/install.sh
+  - apt install -y nvidia-driver-510
+  - apt install -y nvidia-driver-510-server
 
 need_restart: false
