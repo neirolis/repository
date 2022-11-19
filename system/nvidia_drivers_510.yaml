@@ -1,7 +1,8 @@
 name: nvidia_drivers_510
 desc: Install Nvidia 510 driver. Attention! ONLY MANUAL UNINSTALLATION
 version: 0.99
-depends: nvidia_apt_repo
+depends:
+  - nvidia_apt_repo
 exec:
   - apt install -y nvidia-driver-510
   - apt install -y nvidia-driver-510-server
