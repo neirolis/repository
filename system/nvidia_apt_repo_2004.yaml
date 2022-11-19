@@ -1,0 +1,11 @@
+name: nvidia_apt_repo_2004
+desc: Add nvidia apt repository with drivers, cuda and cudnn
+version: 0.99
+exec:
+  - [[ $(lsb_release -rs) == "20.04" ]] || [[ $(lsb_release -rs) == "22.04" ]] && (echo "Compatible OS version"; exit 0) || (echo "Incompatible OS version"; exit 1)
+  - apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+  - apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64/7fa2af80.pub
+  - echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list
+  - echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda_learn.list
+  - apt update
+need_restart: false
