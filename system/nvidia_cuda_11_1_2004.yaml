@@ -1,4 +1,4 @@
-name: nvidia_cuda_11_1
+name: nvidia_cuda_11_1_2004
 desc: Ubuntu 22.04 version. Install CUDA 11.1 and cudnn8. ONLY MANUAL UNINSTALLATION
 version: 0.99
 depends:
