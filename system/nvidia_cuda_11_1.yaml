@@ -1,0 +1,11 @@
+name: nvidia_cuda_11_1
+desc: Install CUDA 11.1 and cudnn8. ONLY MANUAL UNINSTALLATION
+version: 0.99
+depends:
+  - nvidia_apt_repo
+exec:
+  - ubuntuVersion="$(lsb_release -rs)"; if [ "$ubuntuVersion" = "18.04" ] || [ "$ubuntuVersion" = "20.04" ]; then echo "Compatible OS version"; exit 0; else echo "Incompatible OS version"; exit 1; fi
+  - apt install -y cuda-toolkit-11-1
+  - apt install -y libcudnn8=8.0.5.39-1+cuda11.1
+  - apt install -y libcudnn8-dev=8.0.5.39-1+cuda11.1
+need_restart: false
