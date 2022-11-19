@@ -1,0 +1,8 @@
+name: nvidia_apt_repo
+desc: Add nvidia apt repository with drivers, cuda and cudnn
+version: 0.99
+source: https://github.com/workingforfood/rtmip_open_repo/raw/main/nvidia_apt_repo.zip
+exec:
+  - $PKGDIR/install.sh
+
+need_restart: false
