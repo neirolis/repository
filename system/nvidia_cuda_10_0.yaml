@@ -1,0 +1,11 @@
+name: nvidia_cuda_10_0
+desc: Install CUDA 10.0 and cudnn8. WARNING! ONLY MANUAL UNINSTALLATION!!! NO export for PATH and LD_LIBRARY_PATH do it manually!!!
+version: 0.99
+depends:
+  - nvidia_apt_repo
+exec:
+  - ubuntuVersion="$(lsb_release -rs)"; if [ "$ubuntuVersion" = "18.04" ] || [ "$ubuntuVersion" = "20.04" ]; then echo "Compatible OS version"; exit 0; else echo "Incompatible OS version"; exit 1; fi
+  - apt install -y cuda-toolkit-10-0
+  - apt install -y libcudnn7=7.6.5.32-1+cuda10.0
+  - apt install -y libcudnn7-dev=7.6.5.32-1+cuda10.0
+need_restart: false
