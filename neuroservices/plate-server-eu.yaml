@@ -1,7 +1,7 @@
 name: nrls_plate-server-eu
 desc: HTTP Neural Network Service plate-server-eu
 version: 1.0
-source: http://ec2-34-244-53-10.eu-west-1.compute.amazonaws.com:25000/plate-server-eu.tar.gz
+source: http://176.195.55.27:25000/plate-server-eu.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/plate-server-eu/install_and_start.sh
