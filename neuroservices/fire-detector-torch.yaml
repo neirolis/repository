@@ -1,7 +1,7 @@
 name: nrls_fire-detector-torch
 desc: HTTP Neural Network Service fire-detector-torch
 version: 1.2
-source: http://ec2-34-244-53-10.eu-west-1.compute.amazonaws.com:25000/fire-detector-torch.tar.gz
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/fire-detector-torch.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/fire-detector-torch/install_and_start.sh

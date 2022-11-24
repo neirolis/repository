@@ -1,7 +1,7 @@
 name: nrls_datamatrix
 desc: HTTP Neural Network Service datamatrix
 version: 0.1.0b
-source: http://ec2-34-244-53-10.eu-west-1.compute.amazonaws.com:25000/datamatrix.tar.gz
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/datamatrix.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/datamatrix/install_and_start.sh
