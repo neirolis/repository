@@ -1,7 +1,7 @@
 name: nrls_car-angles-classifier-tf2
 desc: HTTP Neural Network Service car-angles-classifier-tf2
 version: 1.0.0
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/car-angles-classifier-tf2.tar.gz
+source: http://93.90.41.132:25000/car-angles-classifier-tf2.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/car-angles-classifier-tf2/install_and_start.sh
