@@ -1,7 +1,7 @@
 name: nrls_plate-detector-india-torch
 desc: HTTP Neural Network Service plate-detector-india-torch
 version: 1.4
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/plate-detector-india-torch.tar.gz
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/plate-detector-india.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/plate-detector-india-torch/install_and_start.sh
