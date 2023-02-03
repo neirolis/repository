@@ -1,10 +1,10 @@
 name: rtmip
 type: rtmip
 desc: RTMIP main package
-version: v6.0.7
+version: v6.0.8
 
-source: https://rtmip.info/rtmip/rtmip_v6.0.7.zip
-md5sum: 8b55c21d27c7d3545629f07762b3a02b
+source: https://rtmip.info/rtmip/rtmip_v6.0.8.zip
+md5sum: f9a902f2a6653cbb7b057601653d8ce4
 
 exec: 
   - cp -f $PKGDIR/rtmip $WD/rtmip
