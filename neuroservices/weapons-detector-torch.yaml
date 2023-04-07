@@ -1,7 +1,7 @@
 name: nrls_weapons-detector-torch
 desc: HTTP Neural Network Service weapons-detector-torch
 version: 1.4
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/weapons-detector-torch.tar.gz
+source: http://176.195.55.27:25000/weapons-detector-torch.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/weapons-detector-torch/install_and_start.sh
