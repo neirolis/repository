@@ -3,7 +3,7 @@ name: reports-famadesa
 desc: Counting of pigs report(xlsx)
 version: v0.1.0
 
-source: https://rtmip.info/plugins/reports-famadesa_v0.1.0.zip
+source: https://rtmip.info/plugins/reports-famadesa.zip
 
 exec:
   - cp -f $PKGDIR/reports-famadesa.so $WD/plugins/

@@ -3,7 +3,7 @@ name: devices-hikvision-doorstation
 desc: Hikvision Door Station
 version: v1.0.0
 
-source: https://rtmip.info/plugins/devices-hikvision-doorstation_v1.0.0.zip
+source: https://rtmip.info/plugins/devices-hikvision-doorstation.zip
 
 exec:
   - cp -f $PKGDIR/devices-hikvision-doorstation.so $WD/plugins/

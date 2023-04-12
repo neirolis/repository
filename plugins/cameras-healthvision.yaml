@@ -3,7 +3,7 @@ name: cameras-healthvision
 desc: Healthvision thermal camera client
 version: v1.0.0
 
-source: https://rtmip.info/plugins/cameras-healthvision_v1.0.0.zip
+source: https://rtmip.info/plugins/cameras-healthvision.zip
 
 exec:
   - cp -f $PKGDIR/cameras-healthvision.so $WD/plugins/

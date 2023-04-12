@@ -3,7 +3,7 @@ name: cameras-defocusing
 desc: Сhecking video stream from camera on defocusing, glare or overlap
 version: v0.0.1
 
-source: https://rtmip.info/plugins/cameras-defocusing_v0.0.1.zip
+source: https://rtmip.info/plugins/cameras-defocusing.zip
 
 exec:
   - cp -f $PKGDIR/cameras-defocusing.so $WD/plugins/
