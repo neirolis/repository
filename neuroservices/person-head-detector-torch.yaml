@@ -1,7 +1,7 @@
 name: nrls_person-head-detector-torch
 desc: HTTP Neural Network Service person-head-detector-torch
 version: 1.4
-source: http://176.195.55.27:25000/person-head-detector-torch.tar.gz
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/person-head-detector-torch.tar.gz
 auth: basic
 exec:
   - ./$PKGDIR/person-head-detector-torch/install_and_start.sh
