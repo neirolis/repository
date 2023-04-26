@@ -1,0 +1,25 @@
+name: ladles-detector-torch
+desc: HTTP Neural Network Service ladles-detector-torch
+version: 1.4
+source: http://ds.ikorsakov.com:25000/ladles-detector-torch.tar.gz
+auth: basic
+exec:
+  - mkdir -p /srv/nn_services/
+  - tar -xzvf /srv/rtmip/packages/ladles-detector-torch.tar.gz
+  - mv /srv/rtmip/ladles-detector-torch/ /srv/nn_services/
+  - rm -rf /srv/rtmip/packages/ladles-detector-torch.tar.gz
+  - cp /srv/nn_services/ladles-detector-torch/ladles-detector-torch.service /etc/systemd/system/
+  - systemctl daemon-reload
+  - systemctl enable ladles-detector-torch
+  - systemctl start ladles-detector-torch
+exec_uninstall:
+  - systemctl stop ladles-detector-torch
+  - systemctl disable ladles-detector-torch
+  - rm -rf /etc/systemd/system/ladles-detector-torch.service
+  - systemctl daemon-reload
+  - rm -rf /srv/nn_services/ladles-detector-torch
+detectors:
+  - name: ladles-detector-torch
+    type: items
+    addrs: [127.0.0.1:64356]
+need_restart: false
