@@ -1,0 +1,16 @@
+name: nrls_masks_4_states_tf2
+desc: HTTP Neural Network Service masks_4_states_tf2
+version: 1.0.0
+source: http://93.90.41.132:25000/masks_4_states_tf2.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/masks_4_states_tf2/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/masks_4_states_tf2/uninstall_and_stop.sh
+
+detectors:
+  - name: nrls_masks_4_states_tf2
+    type: items
+    addrs: [127.0.0.1:65199]
+need_restart: false
