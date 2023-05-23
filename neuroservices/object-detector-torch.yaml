@@ -12,5 +12,5 @@ exec_uninstall:
 detectors:
   - name: nrls_object-detector-torch
     type: items
-    addrs: [127.0.0.1:65529]
+    addrs: [127.0.0.1:65000]
 need_restart: false
