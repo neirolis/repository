@@ -11,5 +11,6 @@ exec:
   - cp -rf --remove-destination $PKGDIR/front/* $WD/front/
   - cp -f $PKGDIR/changelog_en.md $WD/
   - cp -f $PKGDIR/changelog_ru.md $WD/
+  - cp -f "$PKGDIR/User Agreement.pdf" $WD/
 
 need_restart: true
