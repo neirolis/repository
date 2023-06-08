@@ -9,5 +9,7 @@ md5sum: 50b2809ce5ff8216f3db6194dcf2e19b
 exec: 
   - cp -f $PKGDIR/rtmip $WD/rtmip
   - cp -rf --remove-destination $PKGDIR/front/* $WD/front/
+  - cp -f $PKGDIR/changelog_en.md $WD/
+  - cp -f $PKGDIR/changelog_ru.md $WD/
 
 need_restart: true
