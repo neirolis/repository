@@ -1,0 +1,12 @@
+type: modules
+name: cameras-hls
+desc: A camera type that receives an rtsp stream using ffmpeg and presents it in HLS format.
+version: v0.9.0
+
+source: https://rtmip.info/modules/cameras-hls.zip
+
+exec:
+	- mkdir -p $WD/cameras/hls/
+  - cp -f $PKGDIR/* $WD/cameras/hls/
+
+need_restart: true
