@@ -6,7 +6,7 @@ version: v0.9.0
 source: https://rtmip.info/modules/cameras-gstreamer.zip
 
 exec:
-	- mkdir -p $WD/cameras/gstreamer/
+  - mkdir -p $WD/cameras/gstreamer/
   - cp -f $PKGDIR/* $WD/cameras/gstreamer/
 
 need_restart: true
