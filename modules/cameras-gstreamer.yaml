@@ -8,5 +8,3 @@ source: https://rtmip.info/modules/cameras-gstreamer.zip
 exec:
   - mkdir -p $WD/cameras/gstreamer/
   - cp -f $PKGDIR/* $WD/cameras/gstreamer/
-
-need_restart: true

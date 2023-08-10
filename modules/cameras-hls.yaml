@@ -8,5 +8,3 @@ source: https://rtmip.info/modules/cameras-hls.zip
 exec:
   - mkdir -p $WD/cameras/hls/
   - cp -f $PKGDIR/* $WD/cameras/hls/
-
-need_restart: true
