@@ -9,6 +9,7 @@ exec:
   - cp -f $PKGDIR/* /srv/eltis/
   - cp -f /srv/eltis/eltis.service /usr/lib/systemd/system/
   - systemctl daemon-reload
+  - systemctl restart eltis
 
 devices:
   - name: eltis
