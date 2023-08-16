@@ -12,6 +12,6 @@ exec:
 
 devices:
   - name: eltis
-    type: http
+    type: HTTP
     addr: 127.0.0.1:6976
     duration: 5
