@@ -1,0 +1,10 @@
+name: eltis
+desc: ELTIS DP5000.B2-XX
+
+source: https://rtmip.info/devices/eltis.zip
+
+exec:
+  - mkdir -p /srv/eltis/
+  - cp -f $PKGDIR/* /srv/eltis/
+  - cp -f /srv/eltis/eltis.service /usr/lib/systemd/system/
+  - systemctl daemon-reload
