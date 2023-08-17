@@ -1,6 +1,7 @@
 type: devices
 name: eltis
 desc: ELTIS DP5000.B2-XX
+version: v1.0.0
 
 source: https://rtmip.info/devices/eltis.zip
 
@@ -11,11 +12,18 @@ exec:
   - systemctl daemon-reload
   - systemctl restart eltis
 
+exec_uninstall:
+  - systemctl stop eltis
+  - systemctl disable eltis
+  - rm -rf /srv/eltis
+
 devices:
   - name: eltis
     uuid: ae2371e6-25ca-4614-86a3-01b8c167d794
+    desc: ELTIS DP5000.B2-XX, set number door to the URL path.
     type: HTTP
     addr: http://127.0.0.1:6976/open/0
+    enabled: true
     duration: 5
     handler_data:
       method: POST
