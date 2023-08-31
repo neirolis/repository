@@ -1,0 +1,12 @@
+type: modules
+name: cameras-remote
+desc: Starts the ffmpeg process to decode video stream on a remote server over ssh, required predefined configuration file `config-remote.yaml` in the module directory
+version: v0.2.0
+author: sg3des
+url: https://github.com/neirolis/cameras-remote
+
+source: https://rtmip.info/modules/cameras-remote.zip
+
+exec:
+  - mkdir -p $WD/cameras/remote/
+  - cp -f $PKGDIR/* $WD/cameras/remote/
