@@ -1,0 +1,16 @@
+name: nrls_stroitransport-detector-torch
+desc: HTTP Neural Network Service stroitransport-detector-torch
+version: 1.5.0
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/stroitransport-detector-torch.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/stroitransport-detector-torch/install_and_start.sh
+
+exec_uninstall:
+  - /srv/nrls/stroitransport-detector-torch/uninstall_and_stop.sh
+
+detectors:
+  - name: nrls_stroitransport-detector-torch
+    type: items
+    addrs: [127.0.0.1:60121]
+need_restart: false
