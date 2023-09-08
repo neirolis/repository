@@ -1,0 +1,17 @@
+name: nrls_container-recognizer-4digits-tf2
+desc: Container number recognizer - 4 digits
+version: 1.5.4
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/container-recognizer-4digits-tf2.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/container-recognizer-4digits-tf2/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/container-recognizer-4digits-tf2/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/container-recognizer-4digits-tf2/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_container-recognizer-4digits-tf2
+    type: items
+    addrs: [127.0.0.1:65313]
+need_restart: false

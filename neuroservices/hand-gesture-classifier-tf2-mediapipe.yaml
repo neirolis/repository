@@ -1,0 +1,17 @@
+name: nrls_hand-gesture-classifier-tf2-mediapipe
+desc: Classifier of hand gestures for deaf people
+version: 1.5.0
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/hand-gesture-classifier-tf2-mediapipe.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/hand-gesture-classifier-tf2-mediapipe/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/hand-gesture-classifier-tf2-mediapipe/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/hand-gesture-classifier-tf2-mediapipe/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_hand-gesture-classifier-tf2-mediapipe
+    type: items
+    addrs: [127.0.0.1:65306]
+need_restart: false

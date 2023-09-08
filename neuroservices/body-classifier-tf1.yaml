@@ -1,5 +1,5 @@
 name: nrls_body-classifier-tf1
-desc: HTTP Neural Network Service body-classifier-tf1
+desc: Body classifier - wear type (uniform) and sleeve type
 version: 1.4
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/body-classifier-tf1.tar.gz
 auth: basic

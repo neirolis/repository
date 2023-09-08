@@ -1,13 +1,14 @@
 name: nrls_head-classifier-tf1
-desc: HTTP Neural Network Service head-classifier-tf1
-version: 1.4
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/head-classifier-tf1.tar.gz
+desc: Head classifier (headtop, eyes, mouth) for personal protective gear
+version: 1.5.0
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/head-classifier-tf1.tar.gz
 auth: basic
 exec:
-  - ./$PKGDIR/head-classifier-tf1/install_and_start.sh
+  - ./$PKGDIR/head-classifier-tf1/nrls_service_manager.sh --install --start
 
 exec_uninstall:
-  - /srv/nrls/head-classifier-tf1/uninstall_and_stop.sh
+  - /srv/nrls_neural_services/head-classifier-tf1/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/head-classifier-tf1/nrls_service_manager.sh --uninstall
 
 detectors:
   - name: nrls_head-classifier-tf1

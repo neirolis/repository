@@ -1,13 +1,14 @@
 name: nrls_person-detector-thermal-dnetab10
-desc: HTTP Neural Network Service person-detector-thermal-dnetab10
-version: 1.4
-source: http://176.195.55.27:25000/person-detector-thermal-dnetab10.tar.gz
+desc: Detector of people on images from thermal cameras
+version: 1.6.0
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/person-detector-thermal-dnetab10.tar.gz
 auth: basic
 exec:
-  - ./$PKGDIR/person-detector-thermal-dnetab10/install_and_start.sh
+  - ./$PKGDIR/person-detector-thermal-dnetab10/nrls_service_manager.sh --install --start
 
 exec_uninstall:
-  - /srv/nrls/person-detector-thermal-dnetab10/uninstall_and_stop.sh
+  - /srv/nrls_neural_services/person-detector-thermal-dnetab10/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/person-detector-thermal-dnetab10/nrls_service_manager.sh --uninstall
 
 detectors:
   - name: nrls_person-detector-thermal-dnetab10

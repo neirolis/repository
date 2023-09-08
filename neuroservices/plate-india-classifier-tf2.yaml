@@ -1,0 +1,17 @@
+name: nrls_plate-india-classifier-tf2
+desc: Recognition of Indian license plates
+version: 1.5.0
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/plate-india-classifier-tf2.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/plate-india-classifier-tf2/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/plate-india-classifier-tf2/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/plate-india-classifier-tf2/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_plate-india-classifier-tf2
+    type: items
+    addrs: [127.0.0.1:65305]
+need_restart: false

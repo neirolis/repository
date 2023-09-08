@@ -1,13 +1,14 @@
 name: nrls_person-keypoints-torch
-desc: HTTP Neural Network Service person-keypoints-torch
-version: 1.4
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/person-keypoints-torch.tar.gz
+desc: Detector of people and their keypoints
+version: 1.4.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/person-keypoints-torch.tar.gz
 auth: basic
 exec:
-  - ./$PKGDIR/person-keypoints-torch/install_and_start.sh
+  - ./$PKGDIR/person-keypoints-torch/nrls_service_manager.sh --install --start
 
 exec_uninstall:
-  - /srv/nrls/person-keypoints-torch/uninstall_and_stop.sh
+  - /srv/nrls_neural_services/person-keypoints-torch/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/person-keypoints-torch/nrls_service_manager.sh --uninstall
 
 detectors:
   - name: nrls_person-keypoints-torch

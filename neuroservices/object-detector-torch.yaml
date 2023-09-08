@@ -1,16 +1,17 @@
 name: nrls_object-detector-torch
-desc: HTTP Neural Network Service object-detector-torch
-version: 1.4
-source: http://176.195.55.27:25000/object-detector-torch.tar.gz
+desc: Detector for objects (80 COCO classes)
+version: 1.4.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/object-detector-torch.tar.gz
 auth: basic
 exec:
-  - ./$PKGDIR/object-detector-torch/install_and_start.sh
+  - ./$PKGDIR/object-detector-torch/nrls_service_manager.sh --install --start
 
 exec_uninstall:
-  - /srv/nrls/object-detector-torch/uninstall_and_stop.sh
+  - /srv/nrls_neural_services/object-detector-torch/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/object-detector-torch/nrls_service_manager.sh --uninstall
 
 detectors:
   - name: nrls_object-detector-torch
     type: items
-    addrs: [127.0.0.1:65000]
+    addrs: [127.0.0.1:65529]
 need_restart: false

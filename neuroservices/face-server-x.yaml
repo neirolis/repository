@@ -1,5 +1,5 @@
 name: nrls_face-server-x
-desc: HTTP Neural Network Service face-server-x
+desc: Basic service for face embeddings. Also calculates keypoints, angles, quality, emotions.
 version: 1.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/face-server-x.tar.gz
 auth: basic

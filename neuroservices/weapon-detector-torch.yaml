@@ -1,0 +1,17 @@
+name: nrls_weapon-detector-torch
+desc: Detector of weapons inside person bounding box
+version: 1.4.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/weapon-detector-torch.tar.gz
+auth: basic
+exec:
+  - ./$PKGDIR/weapon-detector-torch/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/weapon-detector-torch/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/weapon-detector-torch/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_weapon-detector-torch
+    type: items
+    addrs: [127.0.0.1:65531]
+need_restart: false

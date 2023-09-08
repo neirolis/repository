@@ -1,13 +1,14 @@
 name: nrls_pig-detector-torch
-desc: HTTP Neural Network Service pig-detector-torch
-version: 1.4
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/pig-detector-torch.tar.gz
+desc: Detector of pigs
+version: 1.4.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/pig-detector-torch.tar.gz
 auth: basic
 exec:
-  - ./$PKGDIR/pig-detector-torch/install_and_start.sh
+  - ./$PKGDIR/pig-detector-torch/nrls_service_manager.sh --install --start
 
 exec_uninstall:
-  - /srv/nrls/pig-detector-torch/uninstall_and_stop.sh
+  - /srv/nrls_neural_services/pig-detector-torch/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/pig-detector-torch/nrls_service_manager.sh --uninstall
 
 detectors:
   - name: nrls_pig-detector-torch

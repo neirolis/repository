@@ -1,13 +1,14 @@
 name: nrls_hp-detector-dnetab10
-desc: HTTP Neural Network Service hp-detector-dnetab10
-version: 1.4
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/hp-detector-dnetab10.tar.gz
+desc: Detector of human parts (body, head, arms, legs, eyes, mouth, etc.)
+version: 1.6.0
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/hp-detector-dnetab10.tar.gz
 auth: basic
 exec:
-  - ./$PKGDIR/hp-detector-dnetab10/install_and_start.sh
+  - ./$PKGDIR/hp-detector-dnetab10/nrls_service_manager.sh --install --start
 
 exec_uninstall:
-  - /srv/nrls/hp-detector-dnetab10/uninstall_and_stop.sh
+  - /srv/nrls_neural_services/hp-detector-dnetab10/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/hp-detector-dnetab10/nrls_service_manager.sh --uninstall
 
 detectors:
   - name: nrls_hp-detector-dnetab10

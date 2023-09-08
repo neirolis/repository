@@ -1,13 +1,14 @@
 name: nrls_transport-detector-torch
-desc: HTTP Neural Network Service transport-detector-torch
-version: 1.4
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/transport-detector-torch.tar.gz
+desc: Detector of transport and vehicles (bikes, motorcycles, cars, trucks, forklifts, etc.)
+version: 1.4.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/transport-detector-torch.tar.gz
 auth: basic
 exec:
-  - ./$PKGDIR/transport-detector-torch/install_and_start.sh
+  - ./$PKGDIR/transport-detector-torch/nrls_service_manager.sh --install --start
 
 exec_uninstall:
-  - /srv/nrls/transport-detector-torch/uninstall_and_stop.sh
+  - /srv/nrls_neural_services/transport-detector-torch/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/transport-detector-torch/nrls_service_manager.sh --uninstall
 
 detectors:
   - name: nrls_transport-detector-torch
