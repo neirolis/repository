@@ -1,5 +1,5 @@
 name: nrls_masks-classifier-4states-tf2
-desc: null
+desc: Face mask classifier - mask, half-mask, lowered mask, no mask
 version: 1.5.1
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/masks-classifier-4states-tf2.tar.gz
 auth: basic
