@@ -1,0 +1,9 @@
+name: nvidia_drivers_525_server
+desc: Install Nvidia 525 Server driver. Attention! ONLY MANUAL UNINSTALLATION
+version: 0.99
+depends:
+  - nvidia_apt_repo
+exec:
+  - apt install -y nvidia-driver-525-server
+
+need_restart: false
