@@ -1,0 +1,9 @@
+name: nvidia_drivers_525
+desc: Install Nvidia 525 driver. Attention! ONLY MANUAL UNINSTALLATION
+version: 0.99
+depends:
+  - nvidia_apt_repo
+exec:
+  - apt install -y nvidia-driver-525
+
+need_restart: false
