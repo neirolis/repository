@@ -1,0 +1,9 @@
+name: nvidia_drivers_535
+desc: Install Nvidia 535 driver. Attention! ONLY MANUAL UNINSTALLATION
+version: 0.99
+depends:
+  - nvidia_apt_repo
+exec:
+  - apt install -y nvidia-driver-535
+
+need_restart: false
