@@ -1,6 +1,6 @@
 name: nrls_fire-smoke-detector-torch
 desc: Detector of fire and smoke
-version: 1.0.2
+version: 1.2.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/fire-smoke-detector-torch.tar.gz
 auth: basic
 exec:
