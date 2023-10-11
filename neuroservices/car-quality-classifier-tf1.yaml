@@ -1,6 +1,6 @@
 name: nrls_car-quality-classifier-tf1
 desc: Car classifier (car, damaged car, part car, interior) and quality (blur, overlap, badlight)
-version: 1.1.0
+version: 1.4.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/car-quality-classifier-tf1.tar.gz
 auth: basic
 exec:
