@@ -1,7 +1,7 @@
 type: plugins
 name: auth-ldap
 desc: Authorization using LDAP
-version: v1.0.0
+version: v1.1.0
 
 source: https://rtmip.info/plugins/auth-ldap.zip
 
