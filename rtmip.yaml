@@ -4,7 +4,7 @@ desc: RTMIP main package
 version: v6.10.9-5
 
 source: https://rtmip.info/rtmip/rtmip_v6.10.9-5.zip
-md5sum: 73d1796ddcee8d179003380472d8c595
+md5sum: f1c8b963761de76546ba56702098441e
 
 exec: 
   - cp -f $PKGDIR/rtmip $WD/rtmip
