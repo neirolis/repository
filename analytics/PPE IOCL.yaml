@@ -2,6 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: PPE IOCL
+lock: true
 version: v1.0.0
 scripts:
     - uuid: f2082378-270e-4466-8ecb-468d1e405edf

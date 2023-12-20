@@ -1,6 +1,7 @@
 type: ""
 name: КОКС
 desc: Распознавание номеров вагонов
+lock: true
 version: v0.0.1
 scripts:
     - uuid: 32d72912-bbaa-42f2-8077-1a1c22fde644

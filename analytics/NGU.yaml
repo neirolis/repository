@@ -1,5 +1,6 @@
 type: ""
 name: NGU
+lock: true
 version: v0.0.1
 auth: ""
 authheader: ""

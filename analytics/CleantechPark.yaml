@@ -1,6 +1,7 @@
 type: ""
 name: CleantechParl
 desc: PPE check, Safety zones, motion
+lock: true
 version: v0.0.1
 scripts:
     - uuid: 7a809587-910a-4cac-a414-7eb9b71d6f4a
