@@ -1,5 +1,5 @@
 name: nrls_image-embedder-torch
-desc: HTTP Neural Network Service image-embedder-torch
+desc: HTTP Neural Network Service for Image Embedding
 version: 1.4
 source: http://176.195.55.27:25000/image-embedder-torch.tar.gz
 auth: license, basic
