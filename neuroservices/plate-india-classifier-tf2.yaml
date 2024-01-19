@@ -1,6 +1,6 @@
 name: nrls_plate-india-classifier-tf2
 desc: Recognition of Indian license plates
-version: 1.5.0
+version: 1.7.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/plate-india-classifier-tf2.tar.gz
 auth: license, basic
 exec:
