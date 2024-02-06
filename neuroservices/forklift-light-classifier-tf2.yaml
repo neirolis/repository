@@ -1,6 +1,6 @@
 name: nrls_forklift-light-classifier-tf2
-desc: Classifier of forklift back lights (to define a reverse movement)
-version: 1.1.1
+desc: Classifier of forklift back lights (to detect a reverse movement)
+version: 1.2.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/forklift-light-classifier-tf2.tar.gz
 auth: license, basic
 exec:
