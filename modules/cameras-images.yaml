@@ -1,0 +1,12 @@
+type: modules
+name: cameras-images
+desc: Camera module for reading images from the specified directory 
+version: v0.1.0
+author: sg3des
+url: https://github.com/neirolis/cameras-images
+
+source: https://rtmip.info/modules/cameras-images.zip
+
+exec:
+  - mkdir -p $WD/cameras/images/
+  - cp -f $PKGDIR/* $WD/cameras/images/
