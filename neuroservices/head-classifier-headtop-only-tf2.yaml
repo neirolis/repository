@@ -1,0 +1,17 @@
+name: nrls_head-classifier-headtop-only-tf2
+desc: null
+version: 1.4.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/head-classifier-headtop-only-tf2.tar.gz
+auth: license, basic
+exec:
+  - ./$PKGDIR/head-classifier-headtop-only-tf2/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/head-classifier-headtop-only-tf2/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/head-classifier-headtop-only-tf2/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_head-classifier-headtop-only-tf2
+    type: items
+    addrs: [127.0.0.1:65176]
+need_restart: false
