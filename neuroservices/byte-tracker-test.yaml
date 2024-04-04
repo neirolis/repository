@@ -1,0 +1,12 @@
+name: byte-tracker-test
+desc: HTTP Neural Network Service BYTE TRACKER
+version: 0.1
+source: http://127.0.0.1:25000/new/byte-tracker.tar.gz
+auth: basic
+exec:
+  - echo "Installed"
+
+exec_uninstall:
+  - echo "Uninstalled"
+
+need_restart: false
