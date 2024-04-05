@@ -1,0 +1,17 @@
+name: nrls_torch-source-service
+desc: Source Pytorch service (withough weights and config)
+version: 0.0.2
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/torch-source-service.tar.gz
+auth: license, basic
+exec:
+  - ./$PKGDIR/torch-source-service/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/torch-source-service/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/torch-source-service/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_torch-source-service
+    type: items
+    addrs: [127.0.0.1:0]
+need_restart: false
