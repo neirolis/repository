@@ -1,0 +1,200 @@
+uid: ""
+path: ""
+type: ""
+name: Vehicle cross line
+desc: Vehicle cross line
+version: v0.0.1
+detectors:
+    - uuid: 575e5cc0-8564-47c7-b777-f61ed7315883
+      name: nrls_transport-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:62341
+      mode: ""
+      status:
+        version: 1.4.1
+        name: transport-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - bicycle
+                - motorbike
+                - car
+                - van
+                - truck
+                - bus
+                - tractor
+                - forklifts
+                - truck_special
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: f7bc0daa-85c4-4018-8adb-12cbb7792a4f
+      name: nrls_byte-tracker
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:61222
+      mode: ""
+      status:
+        version: 0.0.1
+        name: nrls_byte-tracker
+        type: universal
+        path: /cvpredict
+      cmd: ""
+analytics:
+    - uuid: c316cfb9-ef34-4367-b78d-2f131c076e8f
+      name: Vehicle cross line
+      enabled: true
+      framerate: 20
+      passhash: []
+      links:
+        detector-lv4zsfcr:
+            "true":
+                - filter-oj8ZeAkvb
+            "false": []
+        detector-xS8kHUBYY:
+            "true":
+                - detector-lv4zsfcr
+            "false": []
+        filter-oj8ZeAkvb:
+            "true":
+                - line-crossing-fXFlRJOFFX
+                - line-crossing-ioOe4wDYV
+                - result
+            "false": []
+        line-crossing-fXFlRJOFFX:
+            "true":
+                - status-eLxge3UoV
+            "false": []
+        line-crossing-ioOe4wDYV:
+            "true":
+                - status-Otf9us7kl
+            "false": []
+        source:
+            "true":
+                - detector-xS8kHUBYY
+            "false": []
+        status-Otf9us7kl:
+            "true":
+                - event-b3dA4bqCe
+                - result
+            "false": []
+        status-eLxge3UoV:
+            "true":
+                - event-b3dA4bqCe
+                - result
+            "false": []
+      blocks:
+        detector-lv4zsfcr:
+            id: detector-lv4zsfcr
+            type: detector
+            data:
+                id: 77
+            position:
+                x: 440
+                "y": 80
+            uuid:
+                - f7bc0daa-85c4-4018-8adb-12cbb7792a4f
+            active: true
+        detector-xS8kHUBYY:
+            id: detector-xS8kHUBYY
+            type: detector
+            data:
+                id: 76
+                type: detector
+            position:
+                x: 210
+                "y": 100
+            uuid:
+                - 575e5cc0-8564-47c7-b777-f61ed7315883
+            active: true
+        event-b3dA4bqCe:
+            id: event-b3dA4bqCe
+            type: event
+            data:
+                interval: "0"
+                saveframe: true
+            position:
+                x: 1820
+                "y": 70
+            active: true
+        filter-oj8ZeAkvb:
+            id: filter-oj8ZeAkvb
+            type: filter
+            data:
+                percentprob: "40"
+                type: filter
+                types:
+                    - bus
+                    - car
+                    - truck
+            position:
+                x: 700
+                "y": 60
+            active: true
+        line-crossing-fXFlRJOFFX:
+            id: line-crossing-fXFlRJOFFX
+            type: line-crossing
+            data:
+                linenames:
+                    - up
+                    - line
+            position:
+                x: 1250
+                "y": -40
+            active: true
+        line-crossing-ioOe4wDYV:
+            id: line-crossing-ioOe4wDYV
+            type: line-crossing
+            data:
+                linenames:
+                    - down
+                    - line2
+            position:
+                x: 1250
+                "y": 219
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 2240
+                "y": 100
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -180
+                "y": 100
+            active: true
+        status-Otf9us7kl:
+            id: status-Otf9us7kl
+            type: status
+            data:
+                state: fail
+            position:
+                x: 1610
+                "y": 300
+            active: true
+        status-eLxge3UoV:
+            id: status-eLxge3UoV
+            type: status
+            data:
+                alert: false
+                state: pass
+            position:
+                x: 1610
+                "y": -150
+            active: true

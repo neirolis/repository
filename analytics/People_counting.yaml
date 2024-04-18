@@ -1,0 +1,210 @@
+uid: ""
+path: ""
+type: ""
+name: People counting
+desc: People counting on a frame / in a zone. Set region to count in a zone or leave region empty to count on a frame.
+version: v0.0.1
+scripts:
+    - uuid: c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+      name: filter_by_size
+      enabled: false
+      source: |-
+        function main(frame) {
+        	var items = []
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i];
+        		// if (item.BBox.W() < 0.03) continue;
+        		// rtmip.Debug(item.BBox.H())
+        		if (item.BBox.H() > 0.5 || item.BBox.W() > 0.5) continue;
+
+        		items.push(item);
+        	}
+
+        	frame.Items = items;
+
+        	return true;
+        }
+    - uuid: 60ab0515-01d6-472f-a480-d71702f1a886
+      name: '!count_people'
+      enabled: false
+      source: |-
+        function main(frame) {
+          // rtmip.Debug(frame.Items.length)
+          var counter = 0
+          for (var i in frame.Items) {
+          		var item = frame.Items[i]
+          		if (item.Type == "person") {
+        		  counter += 1;
+        		}
+          }
+          frame.AddTextBox("Camera: " + frame.Camera.Name + "\nPeople count: " + counter, 0.4, 0.8)
+          return true
+        }
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+    - uuid: 4d7a67ed-2af9-45d5-929c-6692355d466c
+      name: byte
+      enabled: true
+      type: items
+      addrs:
+        - http://127.0.0.1:61223
+      mode: ""
+      status:
+        version: 0.0.2
+        name: nrls_byte-tracker
+        type: universal
+        path: /cvpredict
+      cmd: ""
+analytics:
+    - uuid: 95a1fc8a-c08a-4bd5-ae27-1e3d2ea406bc
+      name: People counting
+      desc: People counting on a frame / in a zone. Set region to count in a zone or leave region empty to count on a frame.
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-lv51no8d:
+            "true":
+                - filter-NoV6D2BTW
+            "false": []
+        detector-lv51nzxl:
+            "true":
+                - script-66QBWdABp
+            "false": []
+        filter-NoV6D2BTW:
+            "true":
+                - detector-lv51nzxl
+            "false": []
+        region-xipMANBcm:
+            "true":
+                - script-nd69S9yqr
+            "false":
+                - script-nd69S9yqr
+        script-66QBWdABp:
+            "true":
+                - region-xipMANBcm
+            "false": []
+        script-nd69S9yqr:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-lv51no8d
+            "false": []
+      blocks:
+        detector-lv51no8d:
+            id: detector-lv51no8d
+            type: detector
+            data:
+                id: 79
+            position:
+                x: 220
+                "y": 0
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        detector-lv51nzxl:
+            id: detector-lv51nzxl
+            type: detector
+            data:
+                id: 80
+            position:
+                x: 620
+                "y": -120
+            uuid:
+                - 4d7a67ed-2af9-45d5-929c-6692355d466c
+            active: true
+        filter-NoV6D2BTW:
+            id: filter-NoV6D2BTW
+            type: filter
+            data:
+                percentprob: "10"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 420
+                "y": -100
+            active: true
+        region-xipMANBcm:
+            id: region-xipMANBcm
+            type: region
+            data:
+                action: ""
+                anchor: 5
+                regionnames:
+                    - enter_zone
+                    - new
+                type: region
+            position:
+                x: 1070
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1540
+                "y": 100
+            active: true
+        script-66QBWdABp:
+            id: script-66QBWdABp
+            type: script
+            data:
+                id: 139
+                type: script
+            position:
+                x: 880
+                "y": 40
+            uuid:
+                - c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+            active: true
+        script-nd69S9yqr:
+            id: script-nd69S9yqr
+            type: script
+            data:
+                id: 140
+                type: script
+            position:
+                x: 1300
+                "y": 99
+            uuid:
+                - 60ab0515-01d6-472f-a480-d71702f1a886
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: 0
+                "y": 100
+            active: true

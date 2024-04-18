@@ -1,6 +1,6 @@
 name: nrls_forklift-angles-classifier-tf2
 desc: Classifier of forklift position (one axis rotations)
-version: 1.0.0
+version: 1.1.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/forklift-angles-classifier-tf2.tar.gz
 auth: license, basic
 exec:

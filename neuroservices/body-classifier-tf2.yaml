@@ -1,6 +1,6 @@
 name: nrls_body-classifier-tf2
 desc: Body classifier - wear type (uniform) and sleeve type
-version: 1.5.1
+version: 1.0.2
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/body-classifier-tf2.tar.gz
 auth: license, basic
 exec:

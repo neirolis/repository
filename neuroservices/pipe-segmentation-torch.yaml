@@ -1,0 +1,17 @@
+name: nrls_pipe-segmentation-torch
+desc: Segmentation of construction pipes
+version: 0.0.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/pipe-segmentation-torch.tar.gz
+auth: license, basic
+exec:
+  - ./$PKGDIR/pipe-segmentation-torch/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/pipe-segmentation-torch/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/pipe-segmentation-torch/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_pipe-segmentation-torch
+    type: universal
+    addrs: [127.0.0.1:61225]
+need_restart: false

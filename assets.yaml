@@ -1,0 +1,10 @@
+name: assets
+type: rtmip
+desc: RTMIP static assets
+version: v6.0.0
+
+source: https://rtmip.info/rtmip/assets.zip
+md5sum: fe2561cdf999352badccc61ccca3b2b4
+
+exec: 
+  - cp -rf $PKGDIR/assets $WD/
