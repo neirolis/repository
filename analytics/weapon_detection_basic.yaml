@@ -1,0 +1,186 @@
+uid: ""
+path: ""
+type: ""
+name: Weapon detection (basic)
+version: v0.0.1
+scripts:
+    - uuid: b17656f2-781d-46a7-a312-861366a16aac
+      name: expandBbox
+      enabled: false
+      source: "// @public type:number default:1.2\r\nvar expandFactor = 1.2\r\n\r\nfunction main(frame) {\r\n  var items = []\r\n\tfor (var i in frame.Items) {\r\n\t\tvar item = frame.Items[i]\r\n\t\titem.BBox = item.BBox.Scale(expandFactor)\r\n\t\titems.push(item)\r\n\t}\r\n\tframe.Items = items\r\n\treturn true;\r\n}"
+    - uuid: fcbdb920-6943-4884-a6ab-de3978e58a9c
+      name: weapon_detection_basic
+      enabled: false
+      source: "// @public type:number default:10\nvar reportsPeriodSec = 10\n\nvar weaponProbs = {\n  \"Pistol\": 0.45,\n  \"Machine gun\": 0.45,\n  \"Rifle\": 0.45,\n  \"Knife\": 0.45,\n  \"Baseball bat\": 0.45\n}\n\nvar lastReport = 0\n\nfunction findWeaponItem(item) {\n    var weaponItem = undefined\n    for (var i in item.Items) {\n        var subItem = item.Items[i]\n        // rtmip.Debugf(\"%+v\", subItem)\n        if (subItem.Type in weaponProbs && subItem.Prob >= weaponProbs[subItem.Type]) {\n            if (!weaponItem) {\n                weaponItem = subItem\n            } else if (subItem.Prob > weaponItem.Prob) {\n                weaponItem = subItem\n            }\n        }\n    }\n\n    return weaponItem\n  \n}\n\nfunction createFailEvent(frame, items, eventStatus) {\n    frame.Save()\n    var event = rtmip.NewEvent(frame, {})\n    event.Items = items\n    event.Status = eventStatus\n    event.State = \"fail\"\n    rtmip.StoreEvent(event)\n}\n\nfunction main(frame) {\n    var newItems = []\n    var needEvent = false\n    var statusMsg = \"Weapon detected\"\n\n    for (var i in frame.Items) {\n        var item = frame.Items[i]\n        // rtmip.Debugf(\"%+v, %+v\", item.Type, item.Name, item.Prob, item)\n        \n        // weapon item\n        var weaponItem = findWeaponItem(item)\n        item.Items = []\n        \n        if (weaponItem) {\n            item.State = \"fail\"\n            weaponItem.State = \"fail\"\n            item.Items = [weaponItem]\n            needEvent = true\n        }\n    }\n\n    if (!needEvent) {\n        return true\n    }\n    \n    if (frame.Time - lastReport > reportsPeriodSec) {\n        frame.Status = statusMsg\n        frame.State = \"fail\"\n        createFailEvent(frame, frame.Items, statusMsg)\n        lastReport = frame.Time\n    }\n    \n    return true\n}"
+detectors:
+    - uuid: 8bb05038-210f-4878-b019-3811ee764f73
+      name: nrls_weapon-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65531
+      mode: ""
+      status:
+        version: 1.4.1
+        name: nrls_weapon-detector-torch
+        type: detector
+        path: /cvpredict
+        input:
+            - person
+        output:
+            types:
+                - Pistol
+                - Machine gun
+                - Rifle
+                - Knife
+                - Axe
+                - Baseball bat
+                - Bottle
+                - Handbag
+                - Umbrella
+                - Mobile phone
+                - Tennis racket
+                - Cup
+                - Mop
+                - Trash
+                - Trunk
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+    - uuid: de79c9c5-4ec9-4dc2-916e-14ff21872510
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: 42b17ffc-2235-430b-bee4-9cc343195c67
+      name: Weapon detection (basic)
+      enabled: true
+      framerate: 3
+      passhash: []
+      links:
+        detector-lv4v9ulr:
+            "true":
+                - filter-lv4va3fk
+            "false": []
+        detector-lv4vaeqf:
+            "true":
+                - script-lv4w9qml
+            "false": []
+        filter-lv4va3fk:
+            "true":
+                - script-lv4vme27
+            "false": []
+        script-lv4vme27:
+            "true":
+                - detector-lv4vaeqf
+            "false": []
+        script-lv4w9qml:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-lv4v9ulr
+            "false": []
+      blocks:
+        detector-lv4v9ulr:
+            id: detector-lv4v9ulr
+            type: detector
+            data:
+                id: 14
+            position:
+                x: 120
+                "y": 100
+            uuid:
+                - de79c9c5-4ec9-4dc2-916e-14ff21872510
+            active: true
+        detector-lv4vaeqf:
+            id: detector-lv4vaeqf
+            type: detector
+            data:
+                id: 17
+            position:
+                x: 740
+                "y": 100
+            uuid:
+                - 8bb05038-210f-4878-b019-3811ee764f73
+            active: true
+        filter-lv4va3fk:
+            id: filter-lv4va3fk
+            type: filter
+            data:
+                percentprob: "70"
+                types:
+                    - person
+            position:
+                x: 320
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 1220
+                "y": 100
+            active: true
+        script-lv4vme27:
+            id: script-lv4vme27
+            type: script
+            data:
+                id: 22
+                values:
+                    expandFactor: "1.4"
+            position:
+                x: 520
+                "y": 100
+            uuid:
+                - b17656f2-781d-46a7-a312-861366a16aac
+            active: true
+        script-lv4w9qml:
+            id: script-lv4w9qml
+            type: script
+            data:
+                id: 23
+                values:
+                    reportsPeriodSec: "10"
+            position:
+                x: 960
+                "y": 100
+            uuid:
+                - fcbdb920-6943-4884-a6ab-de3978e58a9c
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: -80
+                "y": 100
+            active: true
