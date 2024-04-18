@@ -1,0 +1,56 @@
+uid: ""
+path: ""
+type: scripts
+name: filter_exceptions
+version: v0.0.1
+scripts:
+    - uuid: 40874024-0db4-42f4-abfa-f6d75ffab11a
+      name: filter_exceptions
+      desc: 'Filter items: if the center of an item is inside the region named "exception", this item is deleted. There may be several regions with the name "exception" in the frame'
+      enabled: false
+      source: |-
+        // Filter items: if the center of an item is inside the region named "exception", this item is deleted
+        // There may be several regions with the name "exception" in the frame
+
+        //@public type:string default:"exception"
+        var exceptionRegionName = "exception"
+
+        function itemInAnyRegion(item, regions) {
+            var center = item.BBox.Center()
+            var xc = center[0]
+            var yc = center[1]
+
+            for (var i in regions) {
+                var region = regions[i]
+                if (region.Contains(xc, yc)) {
+                    return true // Item is inside one of the exception regions
+                }
+            }
+
+            return false // Item is not inside any of the exception regions
+        }
+
+        function main(frame) {
+            var regions = rtmip.GetCameraRegions(frame)
+            var exceptionRegions = []
+            var filteredItems = []
+
+            for (var i in regions) {
+                var region = regions[i]
+                if (region.Name == exceptionRegionName) {
+                    exceptionRegions.push(region)
+                }
+            }
+
+            for (var i in frame.Items) {
+                var item = frame.Items[i]
+
+                if (!itemInAnyRegion(item, exceptionRegions)) {
+                    filteredItems.push(item)
+                }
+            }
+
+            frame.Items = filteredItems
+
+            return true
+        }

@@ -1,0 +1,42 @@
+uid: ""
+path: ""
+type: scripts
+name: item_count_with_report
+version: v0.0.1
+scripts:
+    - uuid: b6538039-2649-4eae-bc01-55a2fdba145c
+      name: item_count_with_report
+      desc: Counts all items in the frame and creates an event every reportsPeriodSec seconds
+      enabled: false
+      source: |-
+        // Counts all items in the frame and creates an event every reportsPeriodSec seconds
+
+        // @public type:number default:30
+        var reportsPeriodSec = 30
+
+        var camCache = {}
+
+        function createEvent(frame, items, regions) {
+            frame.Save()
+            var event = rtmip.NewEvent(frame, {})
+            event.Items = items
+            event.Regions = regions
+            event.Status = "Number of people: " + items.length
+            rtmip.StoreEvent(event)
+        }
+
+        function main(frame) {
+
+            if (!camCache[frame.Camera.ID]) {
+                camCache[frame.Camera.ID] = {
+                    "lastUpdate": 0
+                }
+            }
+
+            if (frame.Time - camCache[frame.Camera.ID]["lastUpdate"] > reportsPeriodSec) {
+                createEvent(frame, frame.Items, frame.Regions)
+                camCache[frame.Camera.ID]["lastUpdate"] = frame.Time
+            }
+
+            return true
+        }

@@ -1,0 +1,52 @@
+uid: ""
+path: ""
+type: scripts
+name: person_contains_head
+version: v0.0.1
+scripts:
+    - uuid: a808821a-dff2-47b4-b887-5926d7fb433c
+      name: person_contains_head
+      desc: 'Filter items: keep only person items which contain head item(s)'
+      enabled: false
+      source: |-
+        // Filter items: keep only person items which contain head item(s)
+        // Persons without head or heads without person are deleted
+
+        function main(frame) {
+            var filteredItems = []
+
+            for (var i in frame.Items) {
+                var item = frame.Items[i]
+                if (item.Type == "person") {
+                    var containsHead = false
+                    for (var j in frame.Items) {
+                        var otherItem = frame.Items[j]
+                        if (otherItem.Type == "head" && item.BBox.Contains(otherItem.BBox)) {
+                            containsHead = true
+                            break
+                        }
+                    }
+
+                    if (containsHead) {
+                        filteredItems.push(item)
+                    }
+
+                } else if (item.Type == "head") {
+                    var containedInPerson = false
+                    for (var k in frame.Items) {
+                        var otherItem = frame.Items[k]
+                        if (otherItem.type === "person" && otherItem.BBox.Contains(item.BBox)) {
+                            containedInPerson = true
+                            break
+                        }
+                    }
+
+                    if (containedInPerson) {
+                        filteredItems.push(item)
+                    }
+
+                }
+            }
+            frame.Items = filteredItems
+            return true
+        }
