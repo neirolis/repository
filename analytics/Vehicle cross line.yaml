@@ -5,19 +5,6 @@ name: Vehicle cross line
 desc: Vehicle cross line
 version: v0.0.1
 detectors:
-    - uuid: f7bc0daa-85c4-4018-8adb-12cbb7792a4f
-      name: nrls_byte-tracker
-      enabled: true
-      type: items
-      addrs:
-        - 127.0.0.1:61222
-      mode: ""
-      status:
-        version: 0.0.1
-        name: nrls_byte-tracker
-        type: universal
-        path: /cvpredict
-      cmd: ""
     - uuid: 575e5cc0-8564-47c7-b777-f61ed7315883
       name: nrls_transport-detector-torch
       enabled: true
@@ -48,6 +35,19 @@ detectors:
         width: 608
         height: 608
       cmd: ""
+    - uuid: f7bc0daa-85c4-4018-8adb-12cbb7792a4f
+      name: nrls_byte-tracker
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:61222
+      mode: ""
+      status:
+        version: 0.0.1
+        name: nrls_byte-tracker
+        type: universal
+        path: /cvpredict
+      cmd: ""
 analytics:
     - uuid: c316cfb9-ef34-4367-b78d-2f131c076e8f
       name: Vehicle cross line
@@ -57,17 +57,17 @@ analytics:
       links:
         detector-lv4zsfcr:
             "true":
-                - line-crossing-fXFlRJOFFX
-                - line-crossing-ioOe4wDYV
-                - result
+                - filter-oj8ZeAkvb
             "false": []
         detector-xS8kHUBYY:
             "true":
-                - filter-oj8ZeAkvb
+                - detector-lv4zsfcr
             "false": []
         filter-oj8ZeAkvb:
             "true":
-                - detector-lv4zsfcr
+                - line-crossing-fXFlRJOFFX
+                - line-crossing-ioOe4wDYV
+                - result
             "false": []
         line-crossing-fXFlRJOFFX:
             "true":
@@ -98,8 +98,8 @@ analytics:
             data:
                 id: 77
             position:
-                x: 720
-                "y": 100
+                x: 440
+                "y": 80
             uuid:
                 - f7bc0daa-85c4-4018-8adb-12cbb7792a4f
             active: true
@@ -136,8 +136,8 @@ analytics:
                     - car
                     - truck
             position:
-                x: 440
-                "y": 100
+                x: 700
+                "y": 60
             active: true
         line-crossing-fXFlRJOFFX:
             id: line-crossing-fXFlRJOFFX
