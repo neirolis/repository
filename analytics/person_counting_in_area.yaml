@@ -2,7 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: Person counting in the area
-desc: People counting on the frame / in the area. Set region to count in the area or leave region empty to count on the frame.
+desc: Person counting on the frame / in the area. Set region to count in the area or leave region empty to count on the frame.
 version: v0.0.1
 scripts:
     - uuid: c701ddf0-dfd6-4577-bcfe-aa1c052481e1
