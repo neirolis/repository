@@ -1,7 +1,7 @@
 uid: ""
 path: ""
 type: ""
-name: People counting
+name: person_zone_counting
 desc: People counting on a frame / in a zone. Set region to count in a zone or leave region empty to count on a frame.
 version: v0.0.1
 scripts:
@@ -67,22 +67,9 @@ detectors:
         width: 640
         height: 640
       cmd: ""
-    - uuid: 4d7a67ed-2af9-45d5-929c-6692355d466c
-      name: byte
-      enabled: true
-      type: items
-      addrs:
-        - http://127.0.0.1:61223
-      mode: ""
-      status:
-        version: 0.0.2
-        name: nrls_byte-tracker
-        type: universal
-        path: /cvpredict
-      cmd: ""
 analytics:
     - uuid: 95a1fc8a-c08a-4bd5-ae27-1e3d2ea406bc
-      name: People counting
+      name: person_zone_counting
       desc: People counting on a frame / in a zone. Set region to count in a zone or leave region empty to count on a frame.
       enabled: true
       framerate: 10
@@ -92,13 +79,9 @@ analytics:
             "true":
                 - filter-NoV6D2BTW
             "false": []
-        detector-lv51nzxl:
-            "true":
-                - script-66QBWdABp
-            "false": []
         filter-NoV6D2BTW:
             "true":
-                - detector-lv51nzxl
+                - script-66QBWdABp
             "false": []
         region-xipMANBcm:
             "true":
@@ -129,17 +112,6 @@ analytics:
             uuid:
                 - 73b2ca80-13a3-4074-8dff-d98742bf1b87
             active: true
-        detector-lv51nzxl:
-            id: detector-lv51nzxl
-            type: detector
-            data:
-                id: 80
-            position:
-                x: 620
-                "y": -120
-            uuid:
-                - 4d7a67ed-2af9-45d5-929c-6692355d466c
-            active: true
         filter-NoV6D2BTW:
             id: filter-NoV6D2BTW
             type: filter
@@ -149,8 +121,8 @@ analytics:
                 types:
                     - person
             position:
-                x: 420
-                "y": -100
+                x: 560
+                "y": 40
             active: true
         region-xipMANBcm:
             id: region-xipMANBcm
