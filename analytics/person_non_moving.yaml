@@ -1,0 +1,119 @@
+uid: ""
+path: ""
+type: ""
+name: person_non_moving
+desc: Check if a person non-moved during a set time period
+version: v0.0.1
+scripts:
+    - uuid: a739bd40-94d3-4fb5-89e3-b4d115830107
+      name: '!non_moving_person'
+      enabled: false
+      source: "var MIN_DELTA = 0.07\r\nvar rm_from_cache_timeout = 10\r\nvar rm_from_cache_noupdates_timeout = 5\r\n// @public type:number default:10\r\nvar move_detect_period = 10\r\n\r\nvar camcache = {\r\n\t// camera = {\r\n\t// \tid: {\r\n\t// \t}\r\n\t// }\r\n}\r\n\r\nfunction getCache(frame) {\r\n\tvar cache = camcache[frame.Camera.ID]\r\n\tif (!cache) {\r\n\t\tcache = {}\r\n\t\tcamcache[frame.Camera.ID] = cache\r\n\t}\r\n\treturn cache\r\n}\r\n\r\n\r\n\r\nfunction main(frame) {\r\n\tvar cache = getCache(frame)\r\n\tvar current_timestamp = frame.Time\r\n\tvar need_report = false\r\n\r\n\r\n\tfor (var c_item in cache) {\r\n\t\tif (current_timestamp - cache[c_item]['first_detection'] > rm_from_cache_timeout ||\r\n\t\t\tcurrent_timestamp - cache[c_item]['last_update'] > rm_from_cache_noupdates_timeout) {\r\n\t\t\tdelete cache[c_item];\r\n\t\t}\r\n\t}\r\n\r\n\t// rtmip.Debugf(\"%#v\", current_timestamp)\r\n\tfor (var i in frame.Items) {\r\n\t\tvar item = frame.Items[i]\r\n\t\t\r\n\r\n\t\tif (item.ID in cache) {\r\n\t\t\tcache[item.ID][\"last_update\"] = current_timestamp\r\n\t\t\titem.State = \"fail\" // to make it red and visiable\r\n\t\t\tvar xy = item.BBox.Center()\r\n\r\n\r\n\t\t\tif (Math.abs(cache[item.ID][\"position\"][0] - xy[0]) > MIN_DELTA * item.BBox.W() ||\r\n\t\t\t\tMath.abs(cache[item.ID][\"position\"][1] - xy[1]) > MIN_DELTA * item.BBox.H()) {\r\n\t\t\t\tcache[item.ID][\"first_detection\"] = current_timestamp\r\n\t\t\t\tcache[item.ID][\"position\"] = xy\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\tif (current_timestamp - cache[item.ID][\"first_detection\"] >= move_detect_period) {\r\n\t\t\t\titem.State = \"fail\"\r\n\t\t\t\tframe.Status = \"Non-moving person\"\r\n\r\n\t\t\t\tif (!cache[item.ID][\"reported\"]) {\r\n\t\t\t\t\t// rtmip.Debugf(\"Creating report Standing people: %#v\", current_timestamp)\r\n\t\t\t\t\tcache[item.ID][\"reported\"] = true\r\n\t\t\t\t\tcreateEvent(frame, item)\r\n\t\t\t\t\tneed_report = true\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\telse {\r\n\t\t\tcache[item.ID] = {\r\n\t\t\t\t\"prob\": item.Prob,\r\n\t\t\t\t\"first_detection\": current_timestamp,\r\n\t\t\t\t\"last_update\": current_timestamp,\r\n\t\t\t\t\"position\": item.BBox.Center(),\r\n\t\t\t\t\"num_of_detects\": 1,\r\n\t\t\t\t\"reported\": false\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\treturn need_report\r\n}\r\n\r\n\r\nfunction createEvent(frame, item) {\r\n\tframe.Save()\r\n\tvar event = rtmip.NewEvent(frame, item)\r\n\tevent.Status = frame.Status\r\n\tevent.State = frame.State\r\n\t// event.Alert = true;\r\n\r\n\trtmip.StoreEvent(event)\r\n\treturn true\r\n}"
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: 61fb62e1-b006-44d5-a94b-2ef2cbbdc289
+      name: person_non_moving
+      desc: Check if a person non-moved during a set time period
+      enabled: true
+      framerate: 5
+      passhash: []
+      links:
+        detector-xxt8RV87t:
+            "true":
+                - filter-QRf_YbZfO
+            "false": []
+        filter-QRf_YbZfO:
+            "true":
+                - script-6q5-B9w_P
+            "false": []
+        script-6q5-B9w_P:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-xxt8RV87t
+            "false": []
+      blocks:
+        detector-xxt8RV87t:
+            id: detector-xxt8RV87t
+            type: detector
+            data:
+                id: 79
+                type: detector
+            position:
+                x: 10
+                "y": 60
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        filter-QRf_YbZfO:
+            id: filter-QRf_YbZfO
+            type: filter
+            data:
+                percentprob: "30"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 210
+                "y": 60
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 740
+                "y": 60
+            active: true
+        script-6q5-B9w_P:
+            id: script-6q5-B9w_P
+            type: script
+            data:
+                id: 142
+                type: script
+                values:
+                    move_detect_period: "10"
+            position:
+                x: 460
+                "y": 60
+            uuid:
+                - a739bd40-94d3-4fb5-89e3-b4d115830107
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -200
+                "y": 60
+            active: true
