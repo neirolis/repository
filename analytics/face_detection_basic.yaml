@@ -2,6 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: Face detection (basic)
+desc: Basic face detection
 version: v0.0.1
 detectors:
     - uuid: 89bd4839-0b1f-4cf2-94ec-0085140a6fc1
