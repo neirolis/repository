@@ -1,0 +1,233 @@
+uid: ""
+path: ""
+type: ""
+name: Person absence duration in the area
+version: v0.0.1
+scripts:
+    - uuid: c3806f43-5569-4089-8446-d4356bed21f5
+      name: count_absence_duration_in_area
+      enabled: false
+      source: |-
+        //@public type:string default:"wrk"
+        var regionName = "wrk"
+
+        //@public type:number default:5
+        var minimumDuration = 5
+
+        var regionDataResetDelay = 30
+        var updateImageSequenceThresh = 20
+
+        var numDetectsSequence = 3
+        var numNoDetectsSequence = 3
+
+        var globalRegionsData = {}
+
+        function main(frame) {
+
+            var regions = rtmip.GetCameraRegions(frame)
+            var cameraRegions = []
+
+            for (var i in regions) {
+                var region = regions[i]
+                if (region.Name.indexOf(regionName) >= 0) {
+                    cameraRegions.push(region)
+                }
+            }
+
+            for (var j in cameraRegions) {
+                var regionidx = "" + frame.Camera.ID + cameraRegions[j].ID
+                if (!globalRegionsData[regionidx]) {
+                    globalRegionsData[regionidx] = {
+                        "numDetects": 0,
+                        "numNoDetects": 0,
+                        "name": cameraRegions[j].Name.replace("wrk", "idle"),
+                        "startAbsenceTime": undefined,
+                        "event": undefined,
+                        "lastDetect": 0,
+                        "updateImageSequence": 0
+                    }
+                }
+
+                var regionData = globalRegionsData[regionidx]
+
+                var gotDetect = false
+                for (var i in frame.Items) {
+                    var item = frame.Items[i]
+                    var p = item.BBox.Center()
+
+                    if (cameraRegions[j].Contains(p[0], p[1])) {
+                        item.State = "pass"
+                        gotDetect = true
+                    }
+                }
+
+                if (gotDetect) {
+                    regionData["numDetects"] = Math.min(regionData["numDetects"] + 1, numDetectsSequence)
+                    regionData["numNoDetects"] = Math.max(0, regionData["numNoDetects"] - 1)
+                    // check that last detect was not so long ago
+                    if (frame.Time - regionData["lastDetect"] > regionDataResetDelay) {
+                        // because last detect was long ago reset absenceTime and event
+                        // this should prevent from creating events when camera restores stream
+                        regionData["numNoDetects"] = 0
+                        regionData["event"] = undefined
+                        regionData["startAbsenceTime"] = undefined
+                    }
+                    regionData["lastDetect"] = frame.Time
+                } else {
+                    regionData["numDetects"] = Math.max(0, regionData["numDetects"] - 1)
+                    regionData["numNoDetects"] = Math.min(regionData["numNoDetects"] + 1, numNoDetectsSequence)
+                }
+
+                if (regionData["numDetects"] >= numDetectsSequence) {
+                    // if we got more than <numDetectsSequence> Detects in a row, reset event and absenceTimer
+                    regionData["event"] = undefined
+                    regionData["startAbsenceTime"] = undefined
+                    regionData["numNoDetects"] = 0
+                } else if (regionData["numNoDetects"] >= numNoDetectsSequence) {
+                    regionData["numDetects"] = 0
+                    if (!regionData["startAbsenceTime"]) {
+                        regionData["startAbsenceTime"] = frame.Time
+                    }
+                    var absenceTime = frame.Time - regionData["startAbsenceTime"]
+                    if (absenceTime > minimumDuration) {
+                        if (!regionData["event"]) {
+                            frame.Save()
+                            var event = rtmip.NewEmptyEvent(frame)
+                            event.Items = frame.Items
+                            for (var i in event.Items) {
+                                var item = event.Items[i]
+                                if (!cameraRegions[j].ContainsItems([item], 5)) {   // 5 for center anchor
+                                    item.State = ""
+                                }
+                            }
+                            event.Status = regionData["name"] + ": " + absenceTime
+                            event.State = "fail"
+                            event.Regions = [cameraRegions[j]]
+                            rtmip.StoreEvent(event);
+                            regionData["event"] = event
+                            regionData["updateImageSequence"] = 0
+                        } else {
+                            regionData["updateImageSequence"] += 1
+                            if (regionData["updateImageSequence"] >= updateImageSequenceThresh) {
+                                frame.Save()
+                                regionData["event"].Frame = frame.Filename
+                                regionData["event"].Items = frame.Items
+                                regionData["updateImageSequence"] = 0
+                            }
+                            regionData["event"].Status = regionData["name"] + ": " + absenceTime
+                            regionData["event"].State = frame.State
+                            regionData["event"].Texts = frame.Texts
+                            regionData["event"].Regions = [cameraRegions[j]]
+                            rtmip.ProlongEvent(regionData["event"], frame.Time)
+                        }
+                    }
+                }
+
+            }
+
+            return true
+        }
+detectors:
+    - uuid: 7b4ee37a-d535-4082-b72d-e8e5e364bdbd
+      name: nrls_person-head-detector-torch
+      desc: 10.0.40.21:65530
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: 8deee93b-2540-4605-8536-1150429c5cbd
+      name: Person absence duration in the area
+      desc: Counting the absence duration of an area, when there is no people in the area. Counting occurs with prolongation of the event. When a person enters the area, the event with the duration of absence in the area is saved.
+      enabled: true
+      framerate: 3
+      passhash: []
+      links:
+        detector-cckPGC1sD:
+            "true":
+                - filter-lp2aa1og
+            "false": []
+        filter-lp2aa1og:
+            "true":
+                - script-lmais31c
+            "false": []
+        script-lmais31c:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-cckPGC1sD
+            "false": []
+      blocks:
+        detector-cckPGC1sD:
+            id: detector-cckPGC1sD
+            type: detector
+            data:
+                id: 26
+            position:
+                x: -420
+                "y": 80
+            uuid:
+                - 7b4ee37a-d535-4082-b72d-e8e5e364bdbd
+            active: true
+        filter-lp2aa1og:
+            id: filter-lp2aa1og
+            type: filter
+            data:
+                percentprob: "71"
+                types:
+                    - person
+            position:
+                x: -200
+                "y": 80
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 240
+                "y": 80
+            active: true
+        script-lmais31c:
+            id: script-lmais31c
+            type: script
+            data:
+                id: 32
+                values:
+                    workingTimeThresh: "5"
+            position:
+                x: 20
+                "y": 80
+            uuid:
+                - c3806f43-5569-4089-8446-d4356bed21f5
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: -640
+                "y": 80
+            active: true
