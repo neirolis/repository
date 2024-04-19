@@ -1,0 +1,212 @@
+uid: ""
+path: ""
+type: ""
+name: person_zone_crossing
+desc: Counting people entering or exiting a zone.
+version: v0.0.1
+scripts:
+    - uuid: 122b0d00-ef1b-4286-89c4-a405500be5c2
+      name: '!global_people_counter'
+      enabled: false
+      source: |-
+        var counter = 0
+
+        function main(frame) {
+          // rtmip.Debug(frame.Items.length)
+          for (var i in frame.Items) {
+          		var item = frame.Items[i]
+          		if (item.Type == "person") {
+        		  counter += 1;
+        		}
+          }
+          frame.AddTextBox("Camera: " + frame.Camera.Name + "\nPeople count: " + counter, 0.4, 0.8)
+          return true
+        }
+    - uuid: c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+      name: filter_by_size
+      enabled: false
+      source: |-
+        function main(frame) {
+        	var items = []
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i];
+        		// if (item.BBox.W() < 0.03) continue;
+        		// rtmip.Debug(item.BBox.H())
+        		if (item.BBox.H() > 0.5 || item.BBox.W() > 0.5) continue;
+
+        		items.push(item);
+        	}
+
+        	frame.Items = items;
+
+        	return true;
+        }
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+    - uuid: f7bc0daa-85c4-4018-8adb-12cbb7792a4f
+      name: nrls_byte-tracker
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:61222
+      mode: ""
+      status:
+        version: 0.0.1
+        name: nrls_byte-tracker
+        type: universal
+        path: /cvpredict
+      cmd: ""
+analytics:
+    - uuid: aa5695e6-f7f9-4c9a-926f-2d268d8c778f
+      name: person_zone_crossing
+      desc: Counting people entering or exiting a zone.
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-aUJPGli0p:
+            "true":
+                - filter-NoV6D2BTW
+            "false": []
+        detector-lv6jpvkt:
+            "true":
+                - script-66QBWdABp
+            "false": []
+        filter-NoV6D2BTW:
+            "true":
+                - detector-lv6jpvkt
+            "false": []
+        region-xipMANBcm:
+            "true":
+                - script-nd69S9yqr
+            "false":
+                - script-nd69S9yqr
+        script-66QBWdABp:
+            "true":
+                - region-xipMANBcm
+            "false": []
+        script-nd69S9yqr:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-aUJPGli0p
+            "false": []
+      blocks:
+        detector-aUJPGli0p:
+            id: detector-aUJPGli0p
+            type: detector
+            data:
+                id: 79
+                type: detector
+            position:
+                x: 220
+                "y": 100
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        detector-lv6jpvkt:
+            id: detector-lv6jpvkt
+            type: detector
+            data:
+                id: 77
+            position:
+                x: 660
+                "y": 120
+            uuid:
+                - f7bc0daa-85c4-4018-8adb-12cbb7792a4f
+            active: true
+        filter-NoV6D2BTW:
+            id: filter-NoV6D2BTW
+            type: filter
+            data:
+                percentprob: "10"
+                type: filter
+                types:
+                    - person
+            position:
+                x: 430
+                "y": 100
+            active: true
+        region-xipMANBcm:
+            id: region-xipMANBcm
+            type: region
+            data:
+                action: input
+                anchor: 5
+                regionnames:
+                    - enter_zone
+                    - new
+                type: region
+            position:
+                x: 1070
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1540
+                "y": 100
+            active: true
+        script-66QBWdABp:
+            id: script-66QBWdABp
+            type: script
+            data:
+                id: 139
+                type: script
+            position:
+                x: 850
+                "y": 100
+            uuid:
+                - c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+            active: true
+        script-nd69S9yqr:
+            id: script-nd69S9yqr
+            type: script
+            data:
+                id: 141
+                type: script
+            position:
+                x: 1290
+                "y": 99
+            uuid:
+                - 122b0d00-ef1b-4286-89c4-a405500be5c2
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: 0
+                "y": 100
+            active: true
