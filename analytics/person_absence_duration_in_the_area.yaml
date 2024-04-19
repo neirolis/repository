@@ -1,11 +1,11 @@
 uid: ""
 path: ""
 type: ""
-name: Person duration of stay in the area
+name: Person absence duration in the area
 version: v0.0.1
 scripts:
-    - uuid: be9feed0-b91c-4c0e-8129-f9a7d67f6998
-      name: count_duration_in_area
+    - uuid: c3806f43-5569-4089-8446-d4356bed21f5
+      name: count_absence_duration_in_area
       enabled: false
       source: |-
         //@public type:string default:"wrk"
@@ -13,8 +13,6 @@ scripts:
 
         //@public type:number default:5
         var minimumDuration = 5
-
-
 
         var regionDataResetDelay = 30
         var updateImageSequenceThresh = 20
@@ -28,7 +26,6 @@ scripts:
 
             var regions = rtmip.GetCameraRegions(frame)
             var cameraRegions = []
-            var frameStatusRegionNames = []
 
             for (var i in regions) {
                 var region = regions[i]
@@ -43,8 +40,8 @@ scripts:
                     globalRegionsData[regionidx] = {
                         "numDetects": 0,
                         "numNoDetects": 0,
-                        "name": cameraRegions[j].Name,
-                        "startTime": undefined,
+                        "name": cameraRegions[j].Name.replace("wrk", "idle"),
+                        "startAbsenceTime": undefined,
                         "event": undefined,
                         "lastDetect": 0,
                         "updateImageSequence": 0
@@ -60,10 +57,6 @@ scripts:
 
                     if (cameraRegions[j].Contains(p[0], p[1])) {
                         item.State = "pass"
-                        if (frameStatusRegionNames.indexOf(regionData["name"]) < 0) {
-                            frame.Status += regionData["name"] + ": person in area<br>"
-                            frameStatusRegionNames.push(regionData["name"])
-                        }
                         gotDetect = true
                     }
                 }
@@ -73,11 +66,11 @@ scripts:
                     regionData["numNoDetects"] = Math.max(0, regionData["numNoDetects"] - 1)
                     // check that last detect was not so long ago
                     if (frame.Time - regionData["lastDetect"] > regionDataResetDelay) {
-                        // because last detect was long ago reset startTime and event
+                        // because last detect was long ago reset absenceTime and event
                         // this should prevent from creating events when camera restores stream
-                        regionData["numDetects"] = 1
+                        regionData["numNoDetects"] = 0
                         regionData["event"] = undefined
-                        regionData["startTime"] = undefined
+                        regionData["startAbsenceTime"] = undefined
                     }
                     regionData["lastDetect"] = frame.Time
                 } else {
@@ -85,24 +78,30 @@ scripts:
                     regionData["numNoDetects"] = Math.min(regionData["numNoDetects"] + 1, numNoDetectsSequence)
                 }
 
-                if (regionData["numNoDetects"] >= numNoDetectsSequence) {
-                    // if we got more than <numNoDetectsSequence> noDetects in a row, reset event and startTimer
+                if (regionData["numDetects"] >= numDetectsSequence) {
+                    // if we got more than <numDetectsSequence> Detects in a row, reset event and absenceTimer
                     regionData["event"] = undefined
-                    regionData["startTime"] = undefined
-                    regionData["numDetects"] = 0
-                } else if (regionData["numDetects"] >= numDetectsSequence) {
+                    regionData["startAbsenceTime"] = undefined
                     regionData["numNoDetects"] = 0
-                    if (!regionData["startTime"]) {
-                        regionData["startTime"] = frame.Time
+                } else if (regionData["numNoDetects"] >= numNoDetectsSequence) {
+                    regionData["numDetects"] = 0
+                    if (!regionData["startAbsenceTime"]) {
+                        regionData["startAbsenceTime"] = frame.Time
                     }
-                    var stayDuration = frame.Time - regionData["startTime"]
-                    if (stayDuration >= minimumDuration) {
+                    var absenceTime = frame.Time - regionData["startAbsenceTime"]
+                    if (absenceTime > minimumDuration) {
                         if (!regionData["event"]) {
                             frame.Save()
                             var event = rtmip.NewEmptyEvent(frame)
                             event.Items = frame.Items
-                            event.Status = regionData["name"] + ": " + stayDuration
-                            event.State = "pass"
+                            for (var i in event.Items) {
+                                var item = event.Items[i]
+                                if (!cameraRegions[j].ContainsItems([item], 5)) {   // 5 for center anchor
+                                    item.State = ""
+                                }
+                            }
+                            event.Status = regionData["name"] + ": " + absenceTime
+                            event.State = "fail"
                             event.Regions = [cameraRegions[j]]
                             rtmip.StoreEvent(event);
                             regionData["event"] = event
@@ -115,7 +114,7 @@ scripts:
                                 regionData["event"].Items = frame.Items
                                 regionData["updateImageSequence"] = 0
                             }
-                            regionData["event"].Status = regionData["name"] + ": " + stayDuration
+                            regionData["event"].Status = regionData["name"] + ": " + absenceTime
                             regionData["event"].State = frame.State
                             regionData["event"].Texts = frame.Texts
                             regionData["event"].Regions = [cameraRegions[j]]
@@ -157,9 +156,9 @@ detectors:
         height: 640
       cmd: ""
 analytics:
-    - uuid: a451293f-7b77-4a7d-a7b9-94a6d29c33df
-      name: Person duration of stay in the area
-      desc: Counting the duration a person has been in an area. Counting occurs with prolongation of the event. When a person leaves the area, the event with the duration of stay in the area is saved.
+    - uuid: 8deee93b-2540-4605-8536-1150429c5cbd
+      name: Person absence duration in the area
+      desc: Counting the absence duration of an area, when there is no people in the area. Counting occurs with prolongation of the event. When a person enters the area, the event with the duration of absence in the area is saved.
       enabled: true
       framerate: 3
       passhash: []
@@ -215,14 +214,14 @@ analytics:
             id: script-lmais31c
             type: script
             data:
-                id: 31
+                id: 32
                 values:
                     workingTimeThresh: "5"
             position:
                 x: 20
                 "y": 80
             uuid:
-                - be9feed0-b91c-4c0e-8129-f9a7d67f6998
+                - c3806f43-5569-4089-8446-d4356bed21f5
             active: true
         source:
             id: source
