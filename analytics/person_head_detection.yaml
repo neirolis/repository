@@ -1,0 +1,92 @@
+uid: ""
+path: ""
+type: ""
+name: person_head_detection
+desc: Human detection and filtering by head class
+version: v0.0.1
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: c1b43954-05d3-40af-ac05-2f86a4267758
+      name: person_head_detection
+      desc: Human detection and filtering by head class
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-lvayeo9j:
+            "true":
+                - filter-lvayfb14
+            "false": []
+        filter-lvayfb14:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-lvayeo9j
+            "false": []
+      blocks:
+        detector-lvayeo9j:
+            id: detector-lvayeo9j
+            type: detector
+            data:
+                id: 79
+            position:
+                x: 80
+                "y": 0
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        filter-lvayfb14:
+            id: filter-lvayfb14
+            type: filter
+            data:
+                percentprob: "50"
+                types:
+                    - head
+            position:
+                x: 320
+                "y": -20
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 740
+                "y": 20
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: -160
+                "y": 40
+            active: true

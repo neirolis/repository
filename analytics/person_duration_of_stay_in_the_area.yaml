@@ -2,6 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: Person duration of stay in the area
+desc: Counting the duration a person has been in an area. Counting occurs with prolongation of the event. When a person leaves the area, the event with the duration of stay in the area is saved.
 version: v0.0.1
 scripts:
     - uuid: be9feed0-b91c-4c0e-8129-f9a7d67f6998

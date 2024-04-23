@@ -129,6 +129,7 @@ detectors:
 analytics:
     - uuid: cb3bcdae-cfbb-4be4-8a0f-2a5c319d6ee8
       name: Face detection (basic)
+      desc: Basic face detection
       enabled: true
       framerate: 3
       passhash: []

@@ -2,6 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: Weapon detection (basic)
+desc: Weapon detection
 version: v0.0.1
 scripts:
     - uuid: b17656f2-781d-46a7-a312-861366a16aac
@@ -80,6 +81,7 @@ detectors:
 analytics:
     - uuid: 42b17ffc-2235-430b-bee4-9cc343195c67
       name: Weapon detection (basic)
+      desc: Weapon detection
       enabled: true
       framerate: 3
       passhash: []

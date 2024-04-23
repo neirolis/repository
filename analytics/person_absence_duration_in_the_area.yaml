@@ -2,6 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: Person absence duration in the area
+desc: Counting the absence duration of an area, when there is no people in the area. Counting occurs with prolongation of the event. When a person enters the area, the event with the duration of absence in the area is saved.
 version: v0.0.1
 scripts:
     - uuid: c3806f43-5569-4089-8446-d4356bed21f5

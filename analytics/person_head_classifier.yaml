@@ -1,0 +1,145 @@
+uid: ""
+path: ""
+type: ""
+name: person_head_classifier
+desc: Human detection and filtering by head class + using the head_classifier service
+version: v0.0.1
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+    - uuid: 0fbfe3c2-e16c-4200-a4af-075c3a771c79
+      name: nrls_head-classifier-tf1
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65325
+      mode: ""
+      status:
+        version: 1.8.0
+        name: nrls_head-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        output:
+            types:
+                - empty
+                - hair
+                - hood
+                - cap
+                - beret
+                - hat
+                - baseball_cap
+                - safety_helmet
+                - sun_glasses
+                - eye_glasses
+                - safety_goggles
+                - mask
+                - shawl
+                - fullface_mask
+                - hand
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+analytics:
+    - uuid: 9595ea00-9ec8-4eb7-aeda-fae9ea4c8bfb
+      name: person_head_classifier
+      desc: Human detection and filtering by head class + using the head_classifier service
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-lvaz6ruq:
+            "true":
+                - filter-lvaz7056
+            "false": []
+        detector-lvazahwq:
+            "true":
+                - result
+            "false": []
+        filter-lvaz7056:
+            "true":
+                - detector-lvazahwq
+            "false": []
+        source:
+            "true":
+                - detector-lvaz6ruq
+            "false": []
+      blocks:
+        detector-lvaz6ruq:
+            id: detector-lvaz6ruq
+            type: detector
+            data:
+                id: 79
+            position:
+                x: 40
+                "y": -40
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        detector-lvazahwq:
+            id: detector-lvazahwq
+            type: detector
+            data:
+                id: 83
+            position:
+                x: 480
+                "y": -80
+            uuid:
+                - 0fbfe3c2-e16c-4200-a4af-075c3a771c79
+            active: true
+        filter-lvaz7056:
+            id: filter-lvaz7056
+            type: filter
+            data:
+                percentprob: "50"
+                types:
+                    - head
+            position:
+                x: 240
+                "y": -60
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 800
+                "y": 100
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: -140
+                "y": 0
+            active: true
