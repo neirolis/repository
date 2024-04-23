@@ -1,0 +1,240 @@
+uid: ""
+path: ""
+type: ""
+name: Face profile matching (basic)
+desc: Detect face and check if it matches any profile. If yes, create an event with found profile name, otherwise create fail event.
+version: v0.0.1
+scripts:
+    - uuid: 78a90398-a3f3-4b5a-ad0a-7dfee859f527
+      name: faceProfileMatching
+      enabled: false
+      source: "// @public type:number default:15\nvar reportsPeriodSec = 15\n\n// @public type:number default:60\nvar cacheCleanupPeriod = 60\n\nvar globalCache = {}\n\nfunction getCache(cameraID) {\n    var camCache = globalCache[cameraID]\n    if (!camCache) {\n        camCache = {}\n        globalCache[cameraID] = {}\n    }\n    return camCache\n}\n\nfunction createEvent(frame, item) {\n    frame.Status = item.Name\n    frame.Save()\n    var event = rtmip.NewProfileEvent(frame, item)\n    event.State = item.State\n    rtmip.StoreEvent(event)\n}\n\n\nfunction main(frame) {\n\n    var camCache = getCache(frame.Camera.ID)\n\n    for (var i in frame.Items) {\n        var item = frame.Items[i]\n        var itemCache = camCache[item.ID]\n\n        if (!itemCache) {\n            itemCache = {}\n            itemCache[\"lastReport\"] = 0\n        }\n        \n        // if matching profile is not found, mark item as \"failed\" and assign \"unknown\" name\n        if (!item.Profile) {\n            item.Name = \"Unknown\"\n            item.State = \"fail\"\n        } else {\n            item.State = \"pass\"\n        }\n        \n        // limit reports for each item.ID to once in reportsPeriodSec\n        if (frame.Time - itemCache[\"lastReport\"] >= reportsPeriodSec) {\n            createEvent(frame, item)\n            itemCache[\"lastReport\"] = frame.Time\n        }\n        \n        camCache[item.ID] = itemCache\n    }\n\n    // remove inactive cached objects\n    for (var itemID in camCache) {\n        if (frame.Time - camCache[itemID][\"lastDetect\"] >= cacheCleanupPeriod) {\n            delete camCache[itemID]\n        }\n    }\n\n    return true\n}"
+detectors:
+    - uuid: 89bd4839-0b1f-4cf2-94ec-0085140a6fc1
+      name: fsx_p_cu111
+      enabled: true
+      type: faces
+      addrs:
+        - 127.0.0.1:53246
+      mode: ""
+      status:
+        version: 1.0.0
+        name: faces
+        type: detector
+        path: /cvpredict
+        variables:
+            - type: bool
+              name: items_response
+              label: ITEMS
+              desc: Items response format
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: nodetect
+              label: Without detection
+              desc: Do not use face detection analytic
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_pts
+              label: Keypoints
+              desc: Extract 5 face keypoints for face image
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_quality
+              label: Quality
+              desc: Call face quality analytics to detect poor image conditions
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_emotions
+              label: Expression
+              desc: Recognize emotion from facial expression
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_ang
+              label: Rotation
+              desc: Estimate face position on the image in terms of left-right and up-down angles
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_vect
+              label: Vector
+              desc: Extract person-unique vector for face recognition tasks
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: true
+              data: null
+              class: ""
+              width: 0
+              selected: false
+        output:
+            types:
+                - face
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: -1
+        height: -1
+      cmd: ""
+analytics:
+    - uuid: e7dc1de5-c0ef-494b-91de-6d01a7f0e94f
+      name: Face profile matching (basic)
+      desc: Detect face and check if it matches any profile. If yes, create an event with found profile name, otherwise create fail event.
+      enabled: true
+      framerate: 6
+      passhash: []
+      links:
+        detector-r_Y2BBFgi:
+            "true":
+                - filter-0aPXpSJUF
+            "false": []
+        filter-0aPXpSJUF:
+            "true":
+                - tracking-5QfILnolG
+            "false": []
+        profiles-osdScKhvb:
+            "true":
+                - script-VYKuzdw90
+            "false": []
+        script-VYKuzdw90:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-r_Y2BBFgi
+            "false": []
+        tracking-5QfILnolG:
+            "true":
+                - profiles-osdScKhvb
+            "false": []
+      blocks:
+        detector-r_Y2BBFgi:
+            id: detector-r_Y2BBFgi
+            type: detector
+            data:
+                id: 34
+                type: detector
+            position:
+                x: 180
+                "y": 100
+            uuid:
+                - 89bd4839-0b1f-4cf2-94ec-0085140a6fc1
+            active: true
+        filter-0aPXpSJUF:
+            id: filter-0aPXpSJUF
+            type: filter
+            data:
+                percentprob: "50"
+                type: filter
+            position:
+                x: 400
+                "y": 100
+            active: true
+        profiles-osdScKhvb:
+            id: profiles-osdScKhvb
+            type: profiles
+            data:
+                max_threshold: "1.1"
+                type: profiles
+            position:
+                x: 840
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1280
+                "y": 100
+            active: true
+        script-VYKuzdw90:
+            id: script-VYKuzdw90
+            type: script
+            data:
+                id: 43
+                type: script
+                values:
+                    reportsPeriodSec: "15"
+            position:
+                x: 1060
+                "y": 100
+            uuid:
+                - 78a90398-a3f3-4b5a-ad0a-7dfee859f527
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -40
+                "y": 100
+            active: true
+        tracking-5QfILnolG:
+            id: tracking-5QfILnolG
+            type: tracking
+            data:
+                scale: 2
+                type: tracking
+            position:
+                x: 620
+                "y": 100
+            active: true
