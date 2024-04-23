@@ -1,0 +1,92 @@
+uid: ""
+path: ""
+type: ""
+name: person_detection
+desc: Person Detection
+version: v0.0.1
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: d9a0470c-7e5c-4fb4-9af3-19c5d1bf3703
+      name: person_detection
+      desc: Person Detection
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-lvcggn48:
+            "true":
+                - filter-lvcghwq8
+            "false": []
+        filter-lvcghwq8:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-lvcggn48
+            "false": []
+      blocks:
+        detector-lvcggn48:
+            id: detector-lvcggn48
+            type: detector
+            data:
+                id: 79
+            position:
+                x: 300
+                "y": 60
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        filter-lvcghwq8:
+            id: filter-lvcghwq8
+            type: filter
+            data:
+                percentprob: "10"
+                types:
+                    - person
+            position:
+                x: 540
+                "y": 0
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 800
+                "y": 100
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: 0
+                "y": 100
+            active: true
