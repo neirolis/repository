@@ -1,0 +1,143 @@
+uid: ""
+path: ""
+type: ""
+name: Car quality (basic)
+desc: Basic car quality classification
+version: v0.0.1
+detectors:
+    - uuid: 575e5cc0-8564-47c7-b777-f61ed7315883
+      name: nrls_transport-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:62341
+      mode: ""
+      status:
+        version: 1.4.1
+        name: nrls_transport-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - bicycle
+                - motorbike
+                - car
+                - van
+                - truck
+                - bus
+                - tractor
+                - forklifts
+                - truck_special
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: b2e27d1f-3b4c-4a59-b56d-b3def2103fc6
+      name: nrls_car-quality-classifier-tf1
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65329
+      mode: ""
+      status:
+        version: 1.4.0
+        name: nrls_car-quality-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - car
+        output:
+            types:
+                - car
+                - damaged_car
+                - interrior
+                - part_car
+                - almost_full_car
+                - good
+                - blur
+                - overlap
+                - badlight
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+analytics:
+    - uuid: dbbb9762-778d-49e9-b74e-d9c16559ba46
+      name: Car quality (basic)
+      desc: Basic car quality classification
+      enabled: true
+      framerate: 3
+      passhash: []
+      links:
+        detector-lvc0opdt:
+            "true":
+                - filter-lvc0ov7f
+            "false": []
+        detector-lvc148ub:
+            "true":
+                - result
+            "false": []
+        filter-lvc0ov7f:
+            "true":
+                - detector-lvc148ub
+            "false": []
+        source:
+            "true":
+                - detector-lvc0opdt
+            "false": []
+      blocks:
+        detector-lvc0opdt:
+            id: detector-lvc0opdt
+            type: detector
+            data:
+                id: 35
+            position:
+                x: 220
+                "y": 100
+            uuid:
+                - 575e5cc0-8564-47c7-b777-f61ed7315883
+            active: true
+        detector-lvc148ub:
+            id: detector-lvc148ub
+            type: detector
+            data:
+                id: 37
+            position:
+                x: 660
+                "y": 100
+            uuid:
+                - b2e27d1f-3b4c-4a59-b56d-b3def2103fc6
+            active: true
+        filter-lvc0ov7f:
+            id: filter-lvc0ov7f
+            type: filter
+            data:
+                percentprob: "30"
+                types:
+                    - car
+            position:
+                x: 440
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 880
+                "y": 100
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: 0
+                "y": 100
+            active: true

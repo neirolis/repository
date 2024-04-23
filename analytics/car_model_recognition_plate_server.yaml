@@ -1,0 +1,200 @@
+uid: ""
+path: ""
+type: ""
+name: Car model recognition (plate server)
+desc: Detects cars and recognizes car models.
+version: v0.0.1
+scripts:
+    - uuid: 7ea398e4-e3a2-434c-b15b-f421cdd71667
+      name: addColor
+      enabled: false
+      source: |-
+        function main(frame) {
+
+            for (var i in frame.Items) {
+                var item = frame.Items[i]
+                if (item["colors"].name) {
+                    var color = rtmip.NewItem("color", [])
+                    color.Name = item["colors"].name
+                    item.AddChildItem(color)
+                }
+            }
+
+            return true
+        }
+detectors:
+    - uuid: 92b6ef53-2fbe-4811-bfe3-347e9e9e8b70
+      name: nrls_plate-server
+      enabled: true
+      type: license plate
+      addrs:
+        - 127.0.0.1:64301
+      mode: ""
+      status:
+        version: "0.991"
+        name: license plate
+        type: detector
+        path: /predict
+        variables:
+            - type: bool
+              name: nodetect
+              label: without car detection
+              desc: Do not use transport detection analytic and search plate on whole image
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_model
+              label: Get car model
+              desc: Recognize car manufacturer and model
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: true
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_plate
+              label: Get license plate
+              desc: Detect and recognize license plate
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: true
+              data: null
+              class: ""
+              width: 0
+              selected: false
+        output:
+            types:
+                - car
+                - truck
+                - bus
+                - license_plate
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: -1
+        height: -1
+      params:
+        get_model: true
+        get_plate: false
+      cmd: ""
+analytics:
+    - uuid: 9b8cdb0d-eb46-4413-a424-f5c820309d43
+      name: Car  model recognition (plate server)
+      desc: Detects cars and recognizes car models.
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        colors-PP6zXN6hq:
+            "true":
+                - script-z61ZAae9E
+            "false": []
+        crop-lvaygi65:
+            "true":
+                - detector-lvausl4g
+            "false": []
+        detector-lvausl4g:
+            "true":
+                - filter-oj8ZeAkvb
+            "false": []
+        filter-oj8ZeAkvb:
+            "true":
+                - colors-PP6zXN6hq
+            "false": []
+        script-z61ZAae9E:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - crop-lvaygi65
+            "false": []
+      blocks:
+        colors-PP6zXN6hq:
+            id: colors-PP6zXN6hq
+            type: colors
+            data:
+                type: colors
+            position:
+                x: 900
+                "y": 100
+            active: true
+        crop-lvaygi65:
+            id: crop-lvaygi65
+            type: crop
+            data:
+                regionnames: []
+            position:
+                x: 240
+                "y": 100
+            active: true
+        detector-lvausl4g:
+            id: detector-lvausl4g
+            type: detector
+            data:
+                id: 36
+            position:
+                x: 460
+                "y": 100
+            uuid:
+                - 92b6ef53-2fbe-4811-bfe3-347e9e9e8b70
+            active: true
+        filter-oj8ZeAkvb:
+            id: filter-oj8ZeAkvb
+            type: filter
+            data:
+                percentprob: "40"
+                type: filter
+                types:
+                    - car
+            position:
+                x: 680
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1340
+                "y": 100
+            active: true
+        script-z61ZAae9E:
+            id: script-z61ZAae9E
+            type: script
+            data:
+                id: 38
+                type: script
+            position:
+                x: 1120
+                "y": 100
+            uuid:
+                - 7ea398e4-e3a2-434c-b15b-f421cdd71667
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: 20
+                "y": 100
+            active: true
