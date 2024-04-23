@@ -1,0 +1,209 @@
+uid: ""
+path: ""
+type: ""
+name: person_hand_classifier
+desc: Person Hand Classifier
+version: v0.0.1
+detectors:
+    - uuid: e2f9c6b5-3614-4986-a1d6-1e2b4709e849
+      name: nrls_hp-detector-dnetab10
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65310
+      mode: ""
+      status:
+        version: 1.6.1
+        name: nrls_hp-detector-dnetab10
+        type: detector
+        path: /cvpredict
+        input:
+            - person
+        output:
+            types:
+                - eye
+                - mouth
+                - body
+                - foot
+                - leg
+                - ear
+                - hair
+                - head
+                - arm
+                - nose
+                - hand
+                - half_head_top
+                - half_head_bot
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+    - uuid: 29f6fd02-796c-4efe-94de-18de08dc9771
+      name: nrls_hand-classifier-tf1
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65324
+      mode: ""
+      status:
+        version: 1.8.0
+        name: nrls_hand-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - hand
+        output:
+            types:
+                - naked
+                - glove
+                - beige
+                - white
+                - black
+                - gray
+                - blue
+                - skin
+                - latex
+                - ring
+                - wrong_dressed
+                - safety
+                - torn
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+analytics:
+    - uuid: cbbadb2f-a53c-4c89-a097-68d8f160c550
+      name: person_hand_classifier
+      desc: Person Hand Classifier
+      enabled: true
+      framerate: 3
+      passhash: []
+      links:
+        detector-lvb4fnou:
+            "true":
+                - filter-lvceohst
+            "false": []
+        detector-lvcei1un:
+            "true":
+                - filter-lvb4getg
+            "false": []
+        detector-lvcfkrrt:
+            "true":
+                - result
+            "false": []
+        filter-lvb4getg:
+            "true":
+                - detector-lvb4fnou
+            "false": []
+        filter-lvceohst:
+            "true":
+                - detector-lvcfkrrt
+            "false": []
+        source:
+            "true":
+                - detector-lvcei1un
+            "false": []
+      blocks:
+        detector-lvb4fnou:
+            id: detector-lvb4fnou
+            type: detector
+            data:
+                id: 89
+            position:
+                x: 200
+                "y": 0
+            uuid:
+                - e2f9c6b5-3614-4986-a1d6-1e2b4709e849
+            active: true
+        detector-lvcei1un:
+            id: detector-lvcei1un
+            type: detector
+            data:
+                id: 79
+            position:
+                x: -180
+                "y": 0
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        detector-lvcfkrrt:
+            id: detector-lvcfkrrt
+            type: detector
+            data:
+                id: 87
+            position:
+                x: 620
+                "y": -160
+            uuid:
+                - 29f6fd02-796c-4efe-94de-18de08dc9771
+            active: true
+        filter-lvb4getg:
+            id: filter-lvb4getg
+            type: filter
+            data:
+                percentprob: "40"
+                types:
+                    - person
+            position:
+                x: 40
+                "y": -180
+            active: true
+        filter-lvceohst:
+            id: filter-lvceohst
+            type: filter
+            data:
+                percentprob: "10"
+                types:
+                    - hand
+            position:
+                x: 420
+                "y": 20
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 820
+                "y": 60
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: -420
+                "y": 0
+            active: true
