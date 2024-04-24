@@ -1,0 +1,191 @@
+uid: ""
+path: ""
+type: ""
+name: helmet_detection
+desc: Finds a head, then classifies if there is a helmet on the head or not.
+version: v0.0.1
+scripts:
+    - uuid: 546fb7fe-45a4-4363-bc1f-9a9c53d7e1fa
+      name: '!helmet_alert'
+      enabled: false
+      source: "var HELMET = \"safety_helmet\"\nvar reportPeriodSec = 10.0\n\n\nvar camcache = {\n\t// camera = {\n\t// \tid: {\n\t//      selected: ''\n\t// \t\tmask: n,\n\t// \t\tno-mask: n,\n\t// \t}\n\t// }\n}\n\nvar eventsCount = {\n\t// camera = {\n\t//\tmask: n,\n\t//\tno-mask: n \n\t// }\n}\n\nfunction getHeadtopInfo(item) {\n\tif (item.Type != \"head\") return null;\n\t\n\tvar headtops = item.Items.LookupItemByType(\"head_top_area\");\n\treturn headtops;\n}\n\nfunction createEvent(frame, item, eventStatus) {\n\tframe.Save()\n\tvar event = rtmip.NewEvent(frame, item)\n\tevent.Status = typeof eventStatus == \"undefined\" ? item.Name : eventStatus\n\tevent.State = item.State\n\trtmip.StoreEvent(event)\n}\n\nfunction getCache(frame) {\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {}\n\t\tcamcache[frame.Camera.ID] = {}\n\t}\n\treturn cache\n}\n\nfunction main(frame) {\n\tvar currentTimestamp = Math.round((new Date()).getTime() / 1000);\n\tvar cache = getCache(frame);\n\tvar needReport = false\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tvar itemHeadtopInfo = getHeadtopInfo(item)\n        if (!itemHeadtopInfo || itemHeadtopInfo.Prob < 0.5 || item.ID.indexOf(':') > -1) { continue }\n\n        // Head classifier returns item.Name = \"hair\". This is a temporary fix.\n        // item.Name = \"Head\"\n  \n        var msgStr = \"\"\n        if (itemHeadtopInfo.Name == HELMET) {\n            msgStr = \"Safety helmet\";item.State = \"pass\";\n        } else { \n            msgStr = \"No safety helmet\"; item.State = \"fail\"; needReport = true\n        }\n        \n        var c = cache[item.ID]\n        if (!c) {\n            c = {}\n        } else if (currentTimestamp - c[\"last_report_timestamp\"] < reportPeriodSec) {\n            continue\n        }\n\n        if (item.State == \"fail\" || item.State == \"pass\") {\n            createEvent(frame, item, msgStr)\n        }\n\n        c[itemHeadtopInfo.Name] = itemHeadtopInfo.Prob  \n        c[\"last_report_timestamp\"] = currentTimestamp\n        cache[item.ID] = c\n\t}\n\treturn needReport;\n}"
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+    - uuid: f7bc0daa-85c4-4018-8adb-12cbb7792a4f
+      name: nrls_byte-tracker
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:61222
+      mode: ""
+      status:
+        version: 0.0.1
+        name: nrls_byte-tracker
+        type: universal
+        path: /cvpredict
+      cmd: ""
+    - uuid: a55a2997-4356-40d3-a0b0-5121a2d16234
+      name: nrls_head-classifier-headtop-only-tf2
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65176
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_head-classifier-headtop-only-tf2
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        output:
+            types:
+                - empty
+                - hair
+                - hood
+                - cap
+                - baseball_cap
+                - safety_helmet
+                - indefinable
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+analytics:
+    - uuid: 27f47488-9b0d-4fa8-880e-57c397a40356
+      name: helmet_detection
+      desc: Finds a head, then classifies if there is a helmet on the head or not.
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-HZF25JxYh:
+            "true":
+                - filter-lvdx8qfb
+            "false": []
+        detector-lvdx7zvl:
+            "true":
+                - detector-tqXa2oZxm
+            "false": []
+        detector-tqXa2oZxm:
+            "true":
+                - script-g5Alnf4fa
+            "false": []
+        filter-lvdx8qfb:
+            "true":
+                - detector-lvdx7zvl
+            "false": []
+        script-g5Alnf4fa:
+            "true":
+                - result
+            "false":
+                - result
+        source:
+            "true":
+                - detector-HZF25JxYh
+            "false": []
+      blocks:
+        detector-HZF25JxYh:
+            id: detector-HZF25JxYh
+            type: detector
+            data:
+                id: 79
+                type: detector
+            position:
+                x: -250
+                "y": 100
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        detector-lvdx7zvl:
+            id: detector-lvdx7zvl
+            type: detector
+            data:
+                id: 77
+            position:
+                x: 260
+                "y": 60
+            uuid:
+                - f7bc0daa-85c4-4018-8adb-12cbb7792a4f
+            active: true
+        detector-tqXa2oZxm:
+            id: detector-tqXa2oZxm
+            type: detector
+            data:
+                id: 84
+                type: detector
+            position:
+                x: 820
+                "y": -40
+            uuid:
+                - a55a2997-4356-40d3-a0b0-5121a2d16234
+            active: true
+        filter-lvdx8qfb:
+            id: filter-lvdx8qfb
+            type: filter
+            data:
+                percentprob: "9"
+                types:
+                    - head
+            position:
+                x: 0
+                "y": 40
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1420
+                "y": 100
+            active: true
+        script-g5Alnf4fa:
+            id: script-g5Alnf4fa
+            type: script
+            data:
+                id: 146
+                type: script
+            position:
+                x: 1130
+                "y": 100
+            uuid:
+                - 546fb7fe-45a4-4363-bc1f-9a9c53d7e1fa
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -530
+                "y": 100
+            active: true
