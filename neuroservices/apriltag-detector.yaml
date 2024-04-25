@@ -1,0 +1,17 @@
+name: nrls_apriltag-detector
+desc: Detection and recognition of apriltag codes
+version: 0.0.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/apriltag-detector.tar.gz
+auth: license, basic
+exec:
+  - ./$PKGDIR/apriltag-detector/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/apriltag-detector/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/apriltag-detector/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_apriltag-detector
+    type: items
+    addrs: [127.0.0.1:64464]
+need_restart: false
