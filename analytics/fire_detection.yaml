@@ -1,0 +1,111 @@
+uid: ""
+path: ""
+type: ""
+name: fire_detection
+desc: ' Fire detection and alerting.'
+version: v0.0.1
+scripts:
+    - uuid: d3b5a9b0-0554-4aa0-8009-d458717515ca
+      name: fire_detection_alert
+      enabled: false
+      source: "var SMOKE = 'smoke'\nvar NO_SMOKE ='no_smoke'\nvar FIRE = 'fire'\nvar NO_FIRE = 'no_fire'\n\nvar reportPeriodSec = 10.0\n\nvar camcache = {\n\t// camera = {\n\t// \tid: {\n\t//      selected: ''\n\t// \t\tmask: n,\n\t// \t\tno-mask: n,\n\t// \t}\n\t// }\n}\n\nvar eventsCount = {\n\t// camera = {\n\t//\tmask: n,\n\t//\tno-mask: n \n\t// }\n}\n\n\nfunction createEvent(frame, item, eventStatus) {\n\tframe.Save()\n\tvar event = rtmip.NewEvent(frame, item)\n\tevent.Status = typeof eventStatus == \"undefined\" ? item.Name : eventStatus\n\tevent.State = item.State\n\trtmip.StoreEvent(event)\n}\n\nfunction getCache(frame) {\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {}\n\t\tcamcache[frame.Camera.ID] = {}\n\t}\n\treturn cache\n}\n\nfunction main(frame) {\n\tvar currentTimestamp = Math.round((new Date()).getTime() / 1000);\n\tvar cache = getCache(frame);\n\tvar needReport = false\n\t\n\tfor (var i in frame.Items) {\n\t  var item = frame.Items[i]\n\t // rtmip.Debug(item.Prob)\n\t // rtmip.Debug(i)\n\t // rtmip.Debug('Logical condition')\n\t // rtmip.Debug(item.Prob < 0.01)\n\t // rtmip.Debug(item.Prob)\n\t  //rtmip.Debug(item.ID.indexOf(':') > -1)\n  //   rtmip.Debug(!item || item.Prob < 0.01 || item.ID.indexOf(':') > -1)\n\t  if (!item || item.Prob < 0.20 ){ continue }\n\t\t    \n\t\tvar msgStr = \"\"\n\n\t  if (item.Type == FIRE) {\n        msgStr = \"Fire\"; item.State = \"fail\"; needReport = true\n    } else {\n        msgStr = \"No fire\"; item.State = \"pass\";\n    }\n                \n    var c = cache[item.ID]\n    if (!c) {\n      c = {}\n    } else if (currentTimestamp - c[\"last_report_timestamp\"] < reportPeriodSec) {\n        continue\n      }\n\n    if (item.State == \"fail\") {\n        createEvent(frame, item, msgStr)\n    }\n\n    c[item.Type] = item.Prob  \n    c[\"last_report_timestamp\"] = currentTimestamp\n    cache[item.ID] = c\n\t}\n\treturn needReport;\n}"
+detectors:
+    - uuid: 8f2c4c34-8eac-4bcb-b3f4-3cfb71a7c5a0
+      name: nrls_fire-smoke-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:61347
+      mode: ""
+      status:
+        version: 1.2.0
+        name: nrls_fire-smoke-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - fire
+                - smoke
+                - no_fire
+                - no_smoke
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+analytics:
+    - uuid: d368ecb4-5a8b-475e-b73c-f923aba80bad
+      name: fire_detection
+      desc: ' Fire detection and alerting.'
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-lvdz6knz:
+            "true":
+                - filter-lvf3v0by
+            "false": []
+        filter-lvf3v0by:
+            "true":
+                - script-lvf02c8z
+            "false": []
+        script-lvf02c8z:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-lvdz6knz
+            "false": []
+      blocks:
+        detector-lvdz6knz:
+            id: detector-lvdz6knz
+            type: detector
+            data:
+                id: 90
+            position:
+                x: 220
+                "y": 0
+            uuid:
+                - 8f2c4c34-8eac-4bcb-b3f4-3cfb71a7c5a0
+            active: true
+        filter-lvf3v0by:
+            id: filter-lvf3v0by
+            type: filter
+            data:
+                percentprob: "20"
+                types:
+                    - fire
+            position:
+                x: 440
+                "y": -20
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 940
+                "y": 100
+            active: true
+        script-lvf02c8z:
+            id: script-lvf02c8z
+            type: script
+            data:
+                id: 147
+            position:
+                x: 640
+                "y": -40
+            uuid:
+                - d3b5a9b0-0554-4aa0-8009-d458717515ca
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: 0
+                "y": 100
+            active: true
