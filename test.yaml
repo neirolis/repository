@@ -1,0 +1,60 @@
+name: test
+desc: Package for testing
+version: v0.9.1
+
+source: http://rtmip.info/test/test_v0.9.0.zip
+md5sum: 326280d38991dcbf034f5b25f6b4fdd3
+
+exec: 
+  - cp $PKGDIR/test.txt $WD/test.txt
+
+exec_uninstall:
+  - rm $WD/test.txt
+
+scripts:
+  - name: test-debug
+    source: |
+      function main(frame) {
+        rtmip.Debug(frame.ID)
+      }
+  - name: test2
+    source: |
+      function main(frame) {
+        for (var i in frame.Items) {
+          var item = frame.Items[i]
+          item.Name = "from-test-script"
+        }
+      }
+
+detectors:
+  - name: dummy
+    type: items
+    addrs: [127.0.0.1:64400]
+
+devices:
+  - name: test-device
+    desc: Device description 
+    addr: 127.0.0.1:9999
+    method: POST
+    body: '{"test": true}'
+    json: true
+    duration: 10
+
+notify:
+  - name: test
+    desc: Test notification to the Telegram
+    type: telegram
+    subject: Hello!
+
+charts:
+  - name: test-chart
+    type: bar
+    duration: 3600
+    interval: 600
+    rate: 300
+    cast: max
+    legend: true
+    types: [person]
+    
+
+need_restart: false
