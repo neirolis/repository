@@ -1,0 +1,187 @@
+uid: ""
+path: ""
+type: ""
+name: social_distance
+desc: Counting people in the zone and print how many of them aren't keep the social distance
+version: v0.0.1
+scripts:
+    - uuid: 12567923-e7e6-46eb-a149-4ed77e3dadff
+      name: social distance
+      enabled: false
+      source: "// script created at 21:11:47 May 13\n// @public type:number default:1.6\nvar min_dist_k = 1.15\n\nvar failTime = 0;\nvar camcache = {\n\t// camera = {\n\t// \tid: {\n    //    \"need_report\": , \n    //    \"start_timestamp\": , \n    //    \"last_update\":\n\t// \t}\n\t// }\n}\n\n\nvar AnchorBottom = 3;\n\n\nvar report_after_sec = 1.0\nvar remove_from_cache_after = 5.0\n\nfunction getCache(frame) {\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {\"need_report\": false, \"start_timestamp\": 0.0, \"last_update\": 0.0}\n\t\tcamcache[frame.Camera.ID] = cache\n\t}\n\treturn cache\n}\n\n\nfunction main(frame) {\n    rtmip.Debug(min_dist_k)\n    var persons = 0\n    var violations = 0\n    var cache = getCache(frame)\n    var current_time = frame.Time\n\n    if (cache[\"need_report\"] && (current_time - cache[\"last_update\"]) > remove_from_cache_after){\n    cache = {\"need_report\": false, \"start_timestamp\": 0.0, \"last_update\": 0.0}\n    }\n    var fails = [];\n    for (var i in frame.Items) {\n        var item = frame.Items[i];\n        item.State = \"\"\n        persons++\n        crowdDetection(frame, item)\n        if (item.State == \"fail\") { \n            fails.push(item); \n            violations++;\n        }\n    }\n    // visualising info block\n    frame.AddTextBox(\"SOCIAL DISTANCE:\\n    people total: \"+persons+\"\\n    violations: \"+violations, 0.4, 0.8)\n    // end of visualising info block\n\n    var got_violation = false\n    if (fails.length >= 2) {\n        got_violation = true\n        if (!cache[\"need_report\"]){\n        cache[\"start_timestamp\"] = current_time\n        }\n        cache[\"need_report\"] = true\n        cache[\"last_update\"] = current_time\n        \n        frame.Status = \"crowd: \" + fails.length + \" persons of \" + frame.Items.length + \" total in the zone\"\n\n        if (current_time - cache[\"start_timestamp\"] >= report_after_sec) {\n            frame.State = \"fail\"\n            frame.Alert = true;\n            createEvent(frame);\n        }\n    }\n\n    return got_violation\n}\n\nfunction crowdDetection(frame, item) {\n\tfor (var i in frame.Items) {\n\t\tvar it = frame.Items[i];\n\t\tif (it.ID == item.ID) continue;\n\n\t\tvar a = item.BBox.Anchor(AnchorBottom)\n\t\tvar b = it.BBox.Anchor(AnchorBottom)\n\n\t\tvar dist = a.Distance(b)\n\t\t// var relsize = Math.min(a.H(), b.H()) * 1.1 * (Math.min(a.H(), b.H()) / Math.max(a.H(), b.H()))\n\t\tvar relsize = (Math.max(a.H(), b.H()) + Math.max(a.W(), b.W())) * (min_dist_k * 1.0)\n\t\t// var a_diag = Math.sqrt(a.H()*a.H() + a.W()*a.W())\n\t\t// var b_diag = Math.sqrt(b.H()*b.H() + b.W()*b.W())\n\t\t// var relsize = Math.max(a_diag, b_diag) / Math.min(a_diag/b_diag, b_diag/a_diag) * 0.9\n\t\t//rtmip.Debug(relsize)\n\t\t// var relsize = (a.W() + b.H()) * 0.75\n\n\t\tif (dist < relsize) {\n\t\t\titem.State = \"fail\"\n\t\t\tit.State = \"fail\"\n\t\t}\n\t}\n}\n\nvar eventInterval = 30\nvar eventTime = 0\n\nfunction createEvent(frame) {\n\tif (eventTime > frame.Time) return;\n\teventTime = frame.Time + eventInterval;\n\tframe.Save()\n\n\tvar event = rtmip.NewEmptyEvent(frame)\n\tevent.Items = frame.Items\n\tevent.Status = frame.Status\n\tevent.State = frame.State\n\trtmip.StoreEvent(event);\n}\n"
+    - uuid: c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+      name: filter_by_size
+      enabled: false
+      source: |-
+        function main(frame) {
+        	var items = []
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i];
+        		// if (item.BBox.W() < 0.03) continue;
+        		// rtmip.Debug(item.BBox.H())
+        		if (item.BBox.H() > 0.5 || item.BBox.W() > 0.5) continue;
+
+        		items.push(item);
+        	}
+
+        	frame.Items = items;
+
+        	return true;
+        }
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: aa9b9264-19a8-432a-8dbd-96b66211bc58
+      name: social_distance
+      desc: Counting people in the zone and print how many of them aren't keep the social distance
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-e2vpWqbiF:
+            "true":
+                - filter-575LYti4G
+            "false": []
+        filter-575LYti4G:
+            "true":
+                - tracking-Z2TNcWlfe
+            "false": []
+        region-vhMZYnt5j:
+            "true":
+                - script-0qeQ4RTSk
+            "false": []
+        script-0qeQ4RTSk:
+            "true":
+                - result
+            "false":
+                - result
+        script-pwtiOLZE6:
+            "true":
+                - region-vhMZYnt5j
+            "false": []
+        source:
+            "true":
+                - detector-e2vpWqbiF
+            "false": []
+        tracking-Z2TNcWlfe:
+            "true":
+                - script-pwtiOLZE6
+            "false": []
+      blocks:
+        detector-e2vpWqbiF:
+            id: detector-e2vpWqbiF
+            type: detector
+            data:
+                id: 79
+                type: detector
+            position:
+                x: -260
+                "y": -200
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        filter-575LYti4G:
+            id: filter-575LYti4G
+            type: filter
+            data:
+                percentprob: "20"
+                type: filter
+                types:
+                    - person
+            position:
+                x: -60
+                "y": 70
+            active: true
+        region-vhMZYnt5j:
+            id: region-vhMZYnt5j
+            type: region
+            data:
+                anchor: 5
+                regionnames:
+                    - socdist
+                    - zone1
+                    - zone_1
+                    - pers_zone
+                    - zone
+                type: region
+            position:
+                x: 720
+                "y": -260
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1430
+                "y": 90
+            active: true
+        script-0qeQ4RTSk:
+            id: script-0qeQ4RTSk
+            type: script
+            data:
+                id: 154
+                type: script
+            position:
+                x: 940
+                "y": -270
+            uuid:
+                - 12567923-e7e6-46eb-a149-4ed77e3dadff
+            active: true
+        script-pwtiOLZE6:
+            id: script-pwtiOLZE6
+            type: script
+            data:
+                id: 139
+                type: script
+            position:
+                x: 380
+                "y": -300
+            uuid:
+                - c701ddf0-dfd6-4577-bcfe-aa1c052481e1
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -480
+                "y": 70
+            active: true
+        tracking-Z2TNcWlfe:
+            id: tracking-Z2TNcWlfe
+            type: tracking
+            data:
+                scale: "2"
+                type: tracking
+            position:
+                x: 130
+                "y": 70
+            active: true

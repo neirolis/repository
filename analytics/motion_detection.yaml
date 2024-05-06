@@ -1,0 +1,89 @@
+uid: ""
+path: ""
+type: ""
+name: motion_detection
+desc: If there is motion, it send alert
+version: v0.0.1
+scripts:
+    - uuid: 8bb8b024-58ab-43cb-b7a9-842a6237d025
+      name: Cache_proc
+      enabled: false
+      source: "// SCRIPTS USAGE\n\n// PRINT\n// rtmip.Debugf(\"%+v\", item)\n\n////////////////\n\n// -----------------------------------------------\n\n// Minimum detections on frames for pass\ndetection_num_pass = 3\n\n// Detections duration time for pass and reports interval in seconds \ndetection_sec_pass = 5\n\n// Create report from this script\ncreate_custom_report = true\nreport_each_item = true\n\n// -----------------------------------------------\n\nvar camcache = {}\nfunction getCache(frame) {\n\tvar cache = camcache[frame.Camera.ID]\n\tif (!cache) {\n\t\tcache = {}\n\t\tcamcache[frame.Camera.ID] = cache\n\t}\n\treturn cache\n}\n\nfunction get_classified_item(item, type, name) {\n  if (item.Type != type) return null;\n  return item.Items.LookupItemByType(name);\n}\n\n// CLASSIFIER CACHE FOR PASSING ITEMS AFTER REACHING SETTED DETECTIONS TIME\nfunction classifier_cache(frame_item, cache) {\n  var current_timestamp = Math.round((new Date()).getTime() / 1000);\n  var pass = false\n  return pass\n}\n\n// DETECTOR CACHE FOR PASSING ITEMS AFTER REACHING SETTED DETECIIONS TIME\nfunction detector_cache(item, cache, ts) {\n  var pass = false\n  \n\tif (item.ID in cache) {\n\t  \n\t  cache[item.ID][\"last_detection\"] = ts\n\t  cache[item.ID][\"num_of_detects\"] += 1\n\t  \n\t  if (item.Type in cache[item.ID][\"history\"]) {\n\t    for (var prev_frames_type in cache[item.ID][\"history\"]) {\n\t      if (prev_frames_type == item.Type) {\n\t        cache[item.ID][\"history\"][prev_frames_type] += 1\n\t        if (cache[item.ID][\"history\"][prev_frames_type] >= detection_num_pass && ts - cache[item.ID][\"first_detection\"] >= detection_sec_pass) {\n\t          cache[item.ID][\"history\"][prev_frames_type] = 1\n\t          cache[item.ID][\"first_detection\"] = ts\n\t          pass = true\n\t        }\n\t      }\n\t      else {if (cache[item.ID][\"history\"][prev_frames_type] > 0) {cache[item.ID][\"pose_history\"][prev_frames_type] -= 1}}\n\t    }\n\t  }\n\t  \n\t  else {\n\t    cache[item.ID][\"history\"][pose_item.Type] = 1\n\t  }\n\t // item[\"state\"] = \"fail\"\n\t}\n  \n  // CREATE NEW CACHE ITEM\n  else {\n    var history = {}\n\t\thistory[item.Type] = 1\n\t\tcache[item.ID] = {\n\t\t  \"cache_type\": \"detector\",\n\t\t  \"history\": history,\n  \t\t\"first_detection\": ts,\n  \t\t\"last_detection\": ts,\n  \t\t\"num_of_detects\": 1,\n  \t\t\"reported\": false\n\t\t\t}\n  }\n\n\n  return pass\n}\n\nfunction main(frame) {\n  \n  var cache = getCache(frame);\n  var ts = Math.round((new Date()).getTime() / 1000);\n  \n  // CACHE CLEANING\n  for (var cache_item in cache) {\n\t\tif (ts - cache[cache_item]['first_detection'] > 20) {delete cache[cache_item]}\n\t}\n\t\n  // ITEMS FOR REPORTS\n\tprocessed_items = []\n\tpass_frame_report = false\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\t// rtmip.Debugf(\"%+v\", item)\n\t\t// classifier_item = get_classified_item(item, \"person\", \"pose\")\n\t\t// pass = classifier_cache(item, cache)\n\t\tpass = detector_cache(item, cache, ts)\n\n\t\tif (pass) {\n\t\t  pass_frame_report = true\n\t\t  \n\t    // RED | GREED BBOX\n      // item.State = \"fail\"\n      // item.State = \"pass\"\n      \n      // REPORT EACH ITEM\n      if (report_each_item && create_custom_report) {\n      \tframe.Save()\n        var event = rtmip.NewEmptyEvent(frame)\n        event.Analytics = frame.Analytics[\"Name\"]\n        event.AnalyticsID = frame.Analytics[\"ID\"]\n        \n        if (item.Type == \"motion\") {\n          \n          // EVENT FEED MESSAGE\n          event.Status = \"Движение в области работы станка\"\n          \n          // RED | GREED EVENT FEED MESSAGE COLOR\n          // event.State = \"fail\"\n          // event.State = \"pass\"\n        }\n        \n        report_items = []\n  \t\t  report_items.push(item)\n  \t\t  event.Items = report_items\n        rtmip.StoreEvent(event)\n  \t\t}\n\t  }\n\t  \n\t  processed_items.push(item)\n\t}\n\t\n\t// REPORT ALL ITEMS\n\tif (!report_each_item && pass_frame_report && create_custom_report) {\n    \tframe.Save()\n      var event = rtmip.NewEmptyEvent(frame)\n      event.Analytics = frame.Analytics[\"Name\"]\n      event.AnalyticsID = frame.Analytics[\"ID\"]\n\n      // EVENT FEED MESSAGE\n      event.Status = \"Движение в области работы станка\"\n      \n      // RED | GREED EVENT FEED MESSAGE COLOR\n      // event.State = \"fail\"\n      // event.State = \"pass\"\n\n      report_items = []\n\t\t  report_items.push(item)\n\t\t  event.Items = report_items\n      rtmip.StoreEvent(event)\n\t\t}\n\t\n\t\n\treturn true\n}\n\n\n"
+analytics:
+    - uuid: 833c05e2-dc9a-42f2-b5c1-3096899029c8
+      name: motion_detection
+      desc: If there is motion, it send alert
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        motion-detector-Era3H1j1p:
+            "true":
+                - script-aN8c3Gyep
+            "false": []
+        notify-BLWHZE_xL:
+            "true":
+                - result
+            "false": []
+        script-aN8c3Gyep:
+            "true":
+                - notify-BLWHZE_xL
+            "false": []
+        source:
+            "true":
+                - motion-detector-Era3H1j1p
+            "false": []
+      blocks:
+        motion-detector-Era3H1j1p:
+            id: motion-detector-Era3H1j1p
+            type: motion-detector
+            data:
+                mixlevel: "0.2"
+                regionnames:
+                    - new
+                threshold: "1"
+                type: motion-detector
+            position:
+                x: 240
+                "y": -140
+            active: true
+        notify-BLWHZE_xL:
+            id: notify-BLWHZE_xL
+            type: notify
+            data:
+                interval: "3"
+                type: notify
+            position:
+                x: 800
+                "y": 20
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1080
+                "y": 20
+            active: true
+        script-aN8c3Gyep:
+            id: script-aN8c3Gyep
+            type: script
+            data:
+                id: 148
+                type: script
+            position:
+                x: 540
+                "y": 20
+            uuid:
+                - 8bb8b024-58ab-43cb-b7a9-842a6237d025
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -30
+                "y": 70
+            active: true

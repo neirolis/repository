@@ -1,0 +1,154 @@
+uid: ""
+path: ""
+type: ""
+name: person_count_line
+desc: Count person crossed line
+version: v0.0.1
+scripts:
+    - uuid: 122b0d00-ef1b-4286-89c4-a405500be5c2
+      name: '!global_people_counter'
+      enabled: false
+      source: |-
+        var counter = 0
+
+        function main(frame) {
+          // rtmip.Debug(frame.Items.length)
+          for (var i in frame.Items) {
+          		var item = frame.Items[i]
+          		if (item.Type == "person") {
+        		  counter += 1;
+        		}
+          }
+          frame.AddTextBox("Camera: " + frame.Camera.Name + "\nPeople count: " + counter, 0.4, 0.8)
+          return true
+        }
+detectors:
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: e869f60a-871c-4037-ba26-2966ae36c83f
+      name: person_count_line
+      desc: Count person crossed line
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-lv6njltz:
+            "true":
+                - filter-lv6nketc
+            "false": []
+        filter-lv6nketc:
+            "true":
+                - tracking-lvchfn89
+            "false": []
+        line-crossing-lv6nlzrg:
+            "true":
+                - script-lv6nmhza
+            "false":
+                - script-lv6nmhza
+        script-lv6nmhza:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-lv6njltz
+            "false": []
+        tracking-lvchfn89:
+            "true":
+                - line-crossing-lv6nlzrg
+            "false": []
+      blocks:
+        detector-lv6njltz:
+            id: detector-lv6njltz
+            type: detector
+            data:
+                id: 79
+            position:
+                x: 60
+                "y": 0
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        filter-lv6nketc:
+            id: filter-lv6nketc
+            type: filter
+            data:
+                percentprob: "40"
+                types:
+                    - person
+            position:
+                x: 260
+                "y": -100
+            active: true
+        line-crossing-lv6nlzrg:
+            id: line-crossing-lv6nlzrg
+            type: line-crossing
+            data:
+                linenames:
+                    - line5
+                    - line
+            position:
+                x: 780
+                "y": -280
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 1400
+                "y": 40
+            active: true
+        script-lv6nmhza:
+            id: script-lv6nmhza
+            type: script
+            data:
+                id: 141
+            position:
+                x: 1180
+                "y": -220
+            uuid:
+                - 122b0d00-ef1b-4286-89c4-a405500be5c2
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: -160
+                "y": 40
+            active: true
+        tracking-lvchfn89:
+            id: tracking-lvchfn89
+            type: tracking
+            data:
+                scale: "1"
+            position:
+                x: 480
+                "y": -160
+            active: true
