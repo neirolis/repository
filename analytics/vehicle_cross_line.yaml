@@ -51,6 +51,7 @@ detectors:
 analytics:
     - uuid: c316cfb9-ef34-4367-b78d-2f131c076e8f
       name: Vehicle cross line
+      desc: Vehicle cross line
       enabled: true
       framerate: 20
       passhash: []

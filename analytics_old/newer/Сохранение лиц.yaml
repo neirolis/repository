@@ -407,8 +407,6 @@ analytics:
             position:
                 x: -650
                 "y": 300
-            uuid:
-                - e78da2e1-bc0a-4318-9687-3fa481672b08
             active: true
         event-Tt_WkgW4F:
             id: event-Tt_WkgW4F
@@ -516,3 +514,4 @@ analytics:
                 x: 130
                 "y": 110
             active: true
+

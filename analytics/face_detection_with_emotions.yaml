@@ -132,6 +132,7 @@ detectors:
 analytics:
     - uuid: cb3bcdae-cfbb-4be4-8a0f-2a5c319d6ee8
       name: Face detection with emotions
+      desc: Face detection and emotions recognition
       enabled: true
       framerate: 3
       passhash: []

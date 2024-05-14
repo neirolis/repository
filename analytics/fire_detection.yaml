@@ -2,7 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: fire_detection
-desc: ' Fire detection and alerting.'
+desc: Fire detection and alerting.
 version: v0.0.1
 scripts:
     - uuid: d3b5a9b0-0554-4aa0-8009-d458717515ca
@@ -39,7 +39,7 @@ detectors:
 analytics:
     - uuid: d368ecb4-5a8b-475e-b73c-f923aba80bad
       name: fire_detection
-      desc: ' Fire detection and alerting.'
+      desc: Fire detection and alerting.
       enabled: true
       framerate: 10
       passhash: []

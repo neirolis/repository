@@ -2,7 +2,7 @@ uid: ""
 path: ""
 type: ""
 name: person_zone_crossing
-desc: Counting people entering or exiting a zone.
+dcesc: Counting people entering or exiting a zone.
 version: v0.0.1
 scripts:
     - uuid: 122b0d00-ef1b-4286-89c4-a405500be5c2
