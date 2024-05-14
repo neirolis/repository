@@ -1,0 +1,322 @@
+uid: ""
+path: ""
+type: ""
+name: person_ppe_check
+desc: Combining all the analyst by PPE
+version: v0.0.1
+detectors:
+    - uuid: 218e7414-c6cd-4686-b935-28600a8a0290
+      name: hp-detector-dnetab10
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65310
+      mode: ""
+      status:
+        version: 1.6.1
+        name: nrls_hp-detector-dnetab10
+        type: detector
+        path: /cvpredict
+        input:
+            - person
+        output:
+            types:
+                - eye
+                - mouth
+                - body
+                - foot
+                - leg
+                - ear
+                - hair
+                - head
+                - arm
+                - nose
+                - hand
+                - half_head_top
+                - half_head_bot
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: 29f6fd02-796c-4efe-94de-18de08dc9771
+      name: nrls_hand-classifier-tf1
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65324
+      mode: ""
+      status:
+        version: 1.8.0
+        name: nrls_hand-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - hand
+        output:
+            types:
+                - naked
+                - glove
+                - beige
+                - white
+                - black
+                - gray
+                - blue
+                - skin
+                - latex
+                - ring
+                - wrong_dressed
+                - safety
+                - torn
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+    - uuid: a20164e2-41e7-45d3-bcff-20d26bf91d57
+      name: nrls_body-classifier-tf1
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65193
+      mode: ""
+      status:
+        version: 0.3.0
+        name: nrls_body-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - body
+        output:
+            types:
+                - shirt
+                - jacket
+                - vest
+                - coverall
+                - white
+                - black
+                - gray
+                - blue
+                - red
+                - orange
+                - green
+                - khaki
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+    - uuid: 94be1f3a-b724-4dd7-9740-17ac97da4fb1
+      name: nrls_head-classifier-universal-tf2
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65176
+      mode: ""
+      status:
+        version: 1.7.2
+        name: nrls_head-classifier-universal-tf2
+        type: classifier
+        path: /cvpredict
+        input:
+            - head
+        output:
+            types:
+                - empty
+                - hair
+                - hood
+                - cap
+                - balaclava
+                - safety_helmet
+                - indefinable
+                - no_head
+                - eye_glasses
+                - eye_patch
+                - sun_glasses
+                - fullface_mask
+                - safety_goggles
+                - fullface_helmet
+                - medical_mask
+                - respirator
+                - welding_mask
+                - gas_mask
+                - diving_mask
+                - hand
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+analytics:
+    - uuid: 3855358d-9e5b-4fe3-b99e-fd029ab2c4c1
+      name: person_ppe_check
+      desc: Combining all the analyst by PPE
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-lw6a9zbn:
+            "true":
+                - filter-lw6aafpy
+            "false": []
+        detector-lw6abcjc:
+            "true":
+                - filter-lw6ess79
+            "false": []
+        detector-lw6exxc1:
+            "true":
+                - result
+            "false": []
+        detector-lw6exzgz:
+            "true":
+                - result
+            "false": []
+        detector-lw6ey1k7:
+            "true":
+                - result
+            "false": []
+        filter-lw6aafpy:
+            "true":
+                - detector-lw6abcjc
+            "false": []
+        filter-lw6ess79:
+            "true":
+                - result
+                - detector-lw6exxc1
+                - detector-lw6ey1k7
+                - detector-lw6exzgz
+            "false": []
+        source:
+            "true":
+                - detector-lw6a9zbn
+            "false": []
+      blocks:
+        detector-lw6a9zbn:
+            id: detector-lw6a9zbn
+            type: detector
+            data:
+                id: 79
+            position:
+                x: 0
+                "y": -120
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        detector-lw6abcjc:
+            id: detector-lw6abcjc
+            type: detector
+            data:
+                id: 101
+            position:
+                x: 520
+                "y": 120
+            uuid:
+                - 218e7414-c6cd-4686-b935-28600a8a0290
+            active: true
+        detector-lw6exxc1:
+            id: detector-lw6exxc1
+            type: detector
+            data:
+                id: 102
+            position:
+                x: 1080
+                "y": -420
+            uuid:
+                - 94be1f3a-b724-4dd7-9740-17ac97da4fb1
+            active: true
+        detector-lw6exzgz:
+            id: detector-lw6exzgz
+            type: detector
+            data:
+                id: 87
+            position:
+                x: 1120
+                "y": 60
+            uuid:
+                - 29f6fd02-796c-4efe-94de-18de08dc9771
+            active: true
+        detector-lw6ey1k7:
+            id: detector-lw6ey1k7
+            type: detector
+            data:
+                id: 88
+            position:
+                x: 1200
+                "y": -220
+            uuid:
+                - a20164e2-41e7-45d3-bcff-20d26bf91d57
+            active: true
+        filter-lw6aafpy:
+            id: filter-lw6aafpy
+            type: filter
+            data:
+                percentprob: "30"
+                types:
+                    - person
+            position:
+                x: 240
+                "y": 40
+            active: true
+        filter-lw6ess79:
+            id: filter-lw6ess79
+            type: filter
+            data:
+                percentprob: "20"
+                types:
+                    - body
+                    - hand
+                    - head
+            position:
+                x: 720
+                "y": -100
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 2200
+                "y": -140
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: -240
+                "y": -80
+            active: true
