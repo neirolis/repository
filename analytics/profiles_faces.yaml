@@ -1,0 +1,238 @@
+uid: ""
+path: ""
+type: ""
+name: profiles_faces
+desc: Check person profile, if there is one, then print person name. Else print "unknown".
+version: v0.0.1
+scripts:
+    - uuid: 5782345d-4880-4a45-8978-a2538b9c6056
+      name: '!check_profile'
+      enabled: false
+      source: "// script created at 15:12:41 Sep 14\nfunction createEvent(frame, item) {\n  // var ntf = rtmip.Notification(\"S\")\n  frame.Status = item.Name\n  frame.Save()\n  var event = rtmip.NewProfileEvent(frame, item)\n  if (item.Name == \"unknown\")\n  event.State = \"fail\"\n  rtmip.StoreEvent(event)\n  // ntf.Send(event, frame.ImgDecoder)\n}\n\n\nfunction main(frame) {\n// \tvar startDay = new Date()\n// \tstartDay.setUTCHours(0,0,0,0)\n//   var timestamp = Math.round(startDay.getTime()/1000)\n  \n\tfor (var i in frame.Items) {\n\t  var item = frame.Items[i]\n\t  \n\t  if (item.Profile) {\n\t    createEvent(frame, item)\n  //     // var resp = rtmip.DB().LookupLastEvent(timestamp, {\"profile_id\": item.Profile.id })\n  //     // var err = resp[1]\n  //     // if (err) {\n  //     //   createEvent(frame, item)\n  //     // }\n    }\n    else {\n      item.Name = \"unknown\"\n      createEvent(frame, item)\n    }\n    \n    \n  }\n  return true\n}"
+detectors:
+    - uuid: 914c702a-fd97-4e34-961b-e98e33f935a5
+      name: nrls_face-server-x
+      enabled: true
+      type: faces
+      addrs:
+        - 127.0.0.1:53246
+      mode: ""
+      status:
+        version: 1.0.0
+        name: faces
+        type: detector
+        path: /cvpredict
+        variables:
+            - type: bool
+              name: nodetect
+              label: Without detection
+              desc: Do not use face detection analytic
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_pts
+              label: Keypoints
+              desc: Extract 5 face keypoints for face image
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_quality
+              label: Quality
+              desc: Call face quality analytics to detect poor image conditions
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_emotions
+              label: Expression
+              desc: Recognize emotion from facial expression
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_ang
+              label: Rotation
+              desc: Estimate face position on the image in terms of left-right and up-down angles
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_vect
+              label: Vector
+              desc: Extract person-unique vector for face recognition tasks
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: true
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: items_response
+              label: ITEMS
+              desc: Items response format
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+        output:
+            types:
+                - face
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: -1
+        height: -1
+      cmd: ""
+analytics:
+    - uuid: e7dc1de5-c0ef-494b-91de-6d01a7f0e94f
+      name: profiles_faces
+      desc: Check person profile, if there is one, then print person name. Else print "unknown".
+      enabled: true
+      framerate: 5
+      passhash: []
+      links:
+        detector-r_Y2BBFgi:
+            "true":
+                - filter-0aPXpSJUF
+            "false": []
+        filter-0aPXpSJUF:
+            "true":
+                - tracking-5QfILnolG
+            "false": []
+        profiles-osdScKhvb:
+            "true":
+                - script-VYKuzdw90
+            "false": []
+        script-VYKuzdw90:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-r_Y2BBFgi
+            "false": []
+        tracking-5QfILnolG:
+            "true":
+                - profiles-osdScKhvb
+            "false": []
+      blocks:
+        detector-r_Y2BBFgi:
+            id: detector-r_Y2BBFgi
+            type: detector
+            data:
+                id: 94
+                type: detector
+            position:
+                x: 190
+                "y": 100
+            uuid:
+                - 914c702a-fd97-4e34-961b-e98e33f935a5
+            active: true
+        filter-0aPXpSJUF:
+            id: filter-0aPXpSJUF
+            type: filter
+            data:
+                percentprob: "50"
+                type: filter
+            position:
+                x: 390
+                "y": 100
+            active: true
+        profiles-osdScKhvb:
+            id: profiles-osdScKhvb
+            type: profiles
+            data:
+                max_threshold: "1.1"
+                type: profiles
+            position:
+                x: 840
+                "y": -130
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1500
+                "y": -40
+            active: true
+        script-VYKuzdw90:
+            id: script-VYKuzdw90
+            type: script
+            data:
+                id: 155
+                type: script
+            position:
+                x: 1110
+                "y": -80
+            uuid:
+                - 5782345d-4880-4a45-8978-a2538b9c6056
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: 0
+                "y": 100
+            active: true
+        tracking-5QfILnolG:
+            id: tracking-5QfILnolG
+            type: tracking
+            data:
+                scale: 2
+                type: tracking
+            position:
+                x: 580
+                "y": 100
+            active: true
