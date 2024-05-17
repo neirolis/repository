@@ -1,0 +1,11 @@
+type: plugins
+name: auth-keycloak
+desc: Authorization using Keycloak
+version: v1.0.0
+
+source: https://rtmip.info/plugins/auth-keycloak.zip
+
+exec:
+  - cp -f $PKGDIR/auth-keycloak.so $WD/plugins/
+
+need_restart: true
