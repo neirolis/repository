@@ -1,0 +1,96 @@
+uid: ""
+path: ""
+type: ""
+name: Transport detection (basic)
+desc: Basic transport detection
+version: v0.0.1
+detectors:
+    - uuid: 575e5cc0-8564-47c7-b777-f61ed7315883
+      name: nrls_transport-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:62341
+      mode: ""
+      status:
+        version: 1.4.1
+        name: nrls_transport-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - bicycle
+                - motorbike
+                - car
+                - van
+                - truck
+                - bus
+                - tractor
+                - forklifts
+                - truck_special
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+analytics:
+    - uuid: 4732515d-377b-4d82-a1db-e339d78bb4a1
+      name: Transport detection (basic)
+      desc: Basic transport detection
+      enabled: true
+      framerate: 3
+      passhash: []
+      links:
+        detector-lvc0opdt:
+            "true":
+                - filter-lvc0ov7f
+            "false": []
+        filter-lvc0ov7f:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-lvc0opdt
+            "false": []
+      blocks:
+        detector-lvc0opdt:
+            id: detector-lvc0opdt
+            type: detector
+            data:
+                id: 35
+            position:
+                x: 220
+                "y": 100
+            uuid:
+                - 575e5cc0-8564-47c7-b777-f61ed7315883
+            active: true
+        filter-lvc0ov7f:
+            id: filter-lvc0ov7f
+            type: filter
+            data:
+                percentprob: "30"
+                types:
+                    - car
+            position:
+                x: 440
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 660
+                "y": 100
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: 0
+                "y": 100
+            active: true

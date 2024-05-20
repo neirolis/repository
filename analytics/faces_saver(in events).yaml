@@ -1,0 +1,364 @@
+uid: ""
+path: ""
+type: ""
+name: faces_saver(in events)
+desc: saving faces in events
+version: v0.0.1
+scripts:
+    - uuid: ba74247b-571f-4e5b-b077-c1a6a30b757a
+      name: filter_face_that_match_to_head
+      enabled: false
+      source: "// script created at 14:08:21 Oct 27\nfunction main(frame) {\n\tvar new_items = []\n\t\n\tvar heads = []\n\t\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n\t\tif (item.Type == \"head\"){ heads.push(item) }\n\t}\n\t\n\tfor (var i in frame.Items) {\n\t  var item = frame.Items[i]\n\t  if (item.Type == \"face\"){\n\t    var best_iou_match = 0.0\n\t    for (var j in heads){\n\t      var current_iou = heads[j].BBox.IoU(item.BBox)\n\t      if (current_iou > best_iou_match){ best_iou_match = current_iou }\n\t    }\n\t    \n\t    if (best_iou_match > 0.3){ new_items.push(item) }\n\t  }\n\t}\n\t\n\tframe.Items = new_items\n\treturn true\n}"
+    - uuid: 5a0326fc-00a5-4b02-97b6-5f3dedd6908e
+      name: Face quality filer
+      enabled: false
+      source: "// script created at 11:11:58 сент. 23\\\n\n// view : [\"fullface\", \"profile\", \"birdview\", \"backview\", \"facepart\", \"distractor\", \"trash\"] onehot\n// quality : [\"empty\", \"blur\", \"scale\", \"overlap\", \"expression\", \"badlight\"] many\n\nviews_filter = {\n  \"fullface\": {\"threshold\": 0.6},\n  // \"profile\": {\"threshold\": 0.8},\n  // \"birdview\": {\"threshold\": 0.5},\n  // \"backview\": {\"threshold\": 0.5},\n  \"facepart\": {\"threshold\": 0.6},\n  // \"distractor\": {\"threshold\": 0.5},\n  // \"trash\": {\"threshold\": 0.5}\n}\n\n\nquality_filter = {\n  \"empty\": {\"threshold\": 0.9},\n  \"blur\": {\"threshold\": 0.6},\n  \"scale\": {\"threshold\": 0.6},\n  // \"overlap\": {\"threshold\": 0.5},\n  // \"expression\": {\"threshold\": 0.5},\n  \"badlight\": {\"threshold\": 0.5}\n}\n\n\nfunction main(frame) {\n\n  newitems = []\n\tfor (var i in frame.Items) {\n\t\tvar item = frame.Items[i]\n    flag_view = false\n    flag_qual = false\n    cc = 0\n    rtmip.Debugf(\"%+v\", i)\n\t\tfor (ii in item.Items) {\n\t\t  subitem = item.Items[ii]\n\t\t // cc++\n\t\t // rtmip.Debugf(\"%+v\", cc)\n\t\t  rtmip.Debugf(\"%+v\", subitem.Name)\n\t\t  if (subitem.Name in views_filter) {\n\t      if (subitem.Prob < views_filter[subitem.Name][\"threshold\"]) {continue}\n\t      flag_view = true\n\t    if (subitem.Name in quality_filter)\n\t    \n\t\t      if (subitem.Prob < quality_filter[subitem.Name][\"threshold\"]) {continue}\n\t\t      flag_qual = true\n\t\t  }\n\t\t}\n\t\tif (flag_view && flag_qual) {\n\t\t  newitems.push(item)\n\t\t}\n\n\t}\n\n\tframe.Items = newitems\n// \trtmip.Debugf(\"%+v\", frame.Items)\n\t\n\treturn true\n}"
+detectors:
+    - uuid: 914c702a-fd97-4e34-961b-e98e33f935a5
+      name: nrls_face-server-x
+      enabled: true
+      type: faces
+      addrs:
+        - 127.0.0.1:53246
+      mode: ""
+      status:
+        version: 1.0.0
+        name: faces
+        type: detector
+        path: /cvpredict
+        variables:
+            - type: bool
+              name: nodetect
+              label: Without detection
+              desc: Do not use face detection analytic
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_pts
+              label: Keypoints
+              desc: Extract 5 face keypoints for face image
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_quality
+              label: Quality
+              desc: Call face quality analytics to detect poor image conditions
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_emotions
+              label: Expression
+              desc: Recognize emotion from facial expression
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_ang
+              label: Rotation
+              desc: Estimate face position on the image in terms of left-right and up-down angles
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_vect
+              label: Vector
+              desc: Extract person-unique vector for face recognition tasks
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: true
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: items_response
+              label: ITEMS
+              desc: Items response format
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+        output:
+            types:
+                - face
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: -1
+        height: -1
+      cmd: ""
+    - uuid: d88ff14b-7bc0-4d0d-81c5-f1167ffe0cc5
+      name: nrls_face-quality-classifier-tf2_FACES
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65129
+      mode: ""
+      status:
+        version: 1.7.0
+        name: nrls_face-quality-classifier-tf2
+        type: classifier
+        path: /cvpredict
+        input:
+            - face
+        output:
+            types:
+                - fullface
+                - profile
+                - birdview
+                - backview
+                - facepart
+                - distractor
+                - trash
+                - empty
+                - blur
+                - scale
+                - overlap
+                - expression
+                - badlight
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+    - uuid: 73b2ca80-13a3-4074-8dff-d98742bf1b87
+      name: nrls_person-head-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65530
+      mode: ""
+      status:
+        version: 1.5.0
+        name: nrls_person-head-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - person
+                - head
+                - not_person
+                - not_head
+                - animal
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 640
+        height: 640
+      cmd: ""
+analytics:
+    - uuid: 798d22ad-27bf-4566-9aca-661af4ae17b7
+      name: faces_saver(in events)
+      desc: saving faces in events
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        detector-fZUEoI1Tx:
+            "true":
+                - filter-m3V8CBN-h
+            "false": []
+        detector-lw6i407a:
+            "true":
+                - script-lw6i3l8p
+            "false": []
+        detector-tX2-bCtuh:
+            "true":
+                - filter-PGX_svzBr
+            "false": []
+        filter-PGX_svzBr:
+            "true":
+                - tracking-5YniHY_VK
+            "false": []
+        filter-m3V8CBN-h:
+            "true":
+                - tracking-5YniHY_VK
+            "false": []
+        script-lw6i3l8p:
+            "true":
+                - event-Tt_WkgW4F
+                - result
+            "false": []
+        script-zcuCMute6:
+            "true":
+                - detector-lw6i407a
+            "false": []
+        source:
+            "true":
+                - detector-fZUEoI1Tx
+                - detector-tX2-bCtuh
+            "false": []
+        tracking-5YniHY_VK:
+            "true":
+                - script-zcuCMute6
+            "false": []
+      blocks:
+        detector-fZUEoI1Tx:
+            id: detector-fZUEoI1Tx
+            type: detector
+            data:
+                id: 94
+            position:
+                x: -720
+                "y": -120
+            uuid:
+                - 914c702a-fd97-4e34-961b-e98e33f935a5
+            active: true
+        detector-lw6i407a:
+            id: detector-lw6i407a
+            type: detector
+            data:
+                id: 95
+            position:
+                x: 540
+                "y": 100
+            uuid:
+                - d88ff14b-7bc0-4d0d-81c5-f1167ffe0cc5
+            active: true
+        detector-tX2-bCtuh:
+            id: detector-tX2-bCtuh
+            type: detector
+            data:
+                id: 79
+                type: detector
+            position:
+                x: -720
+                "y": 300
+            uuid:
+                - 73b2ca80-13a3-4074-8dff-d98742bf1b87
+            active: true
+        event-Tt_WkgW4F:
+            id: event-Tt_WkgW4F
+            type: event
+            data:
+                interval: "2"
+                saveframe: true
+                type: event
+            position:
+                x: 1420
+                "y": -120
+            active: true
+        filter-PGX_svzBr:
+            id: filter-PGX_svzBr
+            type: filter
+            data:
+                percentprob: "60"
+                type: filter
+                types:
+                    - head
+            position:
+                x: -380
+                "y": 300
+            active: true
+        filter-m3V8CBN-h:
+            id: filter-m3V8CBN-h
+            type: filter
+            data:
+                percentprob: "40"
+                types:
+                    - face
+            position:
+                x: -420
+                "y": -120
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1420
+                "y": 100
+            active: true
+        script-lw6i3l8p:
+            id: script-lw6i3l8p
+            type: script
+            data:
+                id: 151
+            position:
+                x: 760
+                "y": 100
+            uuid:
+                - 5a0326fc-00a5-4b02-97b6-5f3dedd6908e
+            active: true
+        script-zcuCMute6:
+            id: script-zcuCMute6
+            type: script
+            data:
+                id: 152
+            position:
+                x: 240
+                "y": 100
+            uuid:
+                - ba74247b-571f-4e5b-b077-c1a6a30b757a
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: -1140
+                "y": 80
+            active: true
+        tracking-5YniHY_VK:
+            id: tracking-5YniHY_VK
+            type: tracking
+            data:
+                scale: 2
+                type: tracking
+            position:
+                x: -120
+                "y": 80
+            active: true

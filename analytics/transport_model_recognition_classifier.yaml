@@ -1,0 +1,375 @@
+uid: ""
+path: ""
+type: ""
+name: Transport model recognition (classifier)
+desc: Detects transport and recognizes car models.
+version: v0.0.1
+scripts:
+    - uuid: 4771e215-685e-4217-a3f9-0690944070f7
+      name: DEBUG
+      enabled: false
+      source: |-
+        // script created at 10:08:29 Apr 23
+        function main(frame) {
+        	
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i]
+        		
+        		rtmip.Debugf("%+v", item)
+        	}
+        	
+        	return true
+        }
+    - uuid: 5afb6609-1625-4371-bb4a-dc320dcc77c2
+      name: filterChildItems
+      enabled: false
+      source: "// @public type:number default:0.75\nvar minProb = 0.75\n\nfunction main(frame) {\n\t\n\tfor (var i in frame.Items) {\n\t\t  var item = frame.Items[i]\n\t\t  for (var j in item.Items) {\n\t\t      var childItem = item.Items[j]\n\t\t      if (childItem.Prob < minProb) {\n\t\t          childItem.Name = \"N/A\"\n\t\t      } \n\t\t  }\n\t}\n\t\n\treturn true\n}"
+    - uuid: 7ea398e4-e3a2-434c-b15b-f421cdd71667
+      name: addColor
+      enabled: false
+      source: |-
+        function main(frame) {
+
+            for (var i in frame.Items) {
+                var item = frame.Items[i]
+                if (item["colors"].name) {
+                    var color = rtmip.NewItem("color", [])
+                    color.Name = item["colors"].name
+                    item.AddChildItem(color)
+                }
+            }
+
+            return true
+        }
+detectors:
+    - uuid: 575e5cc0-8564-47c7-b777-f61ed7315883
+      name: nrls_transport-detector-torch
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:62341
+      mode: ""
+      status:
+        version: 1.4.1
+        name: nrls_transport-detector-torch
+        type: detector
+        path: /cvpredict
+        output:
+            types:
+                - bicycle
+                - motorbike
+                - car
+                - van
+                - truck
+                - bus
+                - tractor
+                - forklifts
+                - truck_special
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 608
+        height: 608
+      cmd: ""
+    - uuid: 640d6f5d-5c02-469f-964b-17f81ab8b667
+      name: nrls_car-models-classifier-tf1
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:60763
+      mode: ""
+      status:
+        version: 1.6.0
+        name: nrls_car-models-classifier-tf1
+        type: classifier
+        path: /cvpredict
+        input:
+            - car
+        output:
+            types:
+                - AC
+                - ARO
+                - Acura
+                - Aixam
+                - Alfa Romeo
+                - Alpina
+                - Arola
+                - Asia
+                - Aston Martin
+                - Audi
+                - Austin
+                - Avtokam
+                - BMW
+                - BYD
+                - Bentley
+                - Borgward
+                - Brilliance
+                - Bugatti
+                - Buick
+                - Cadillac
+                - Changan
+                - Chery
+                - Chevrolet
+                - Chrysler
+                - Citroen
+                - Dacia
+                - Daewoo
+                - Daihatsu
+                - Datsun
+                - DeTomaso
+                - Dodge
+                - Dongfeng
+                - Eunos
+                - FAW
+                - FIAT
+                - Ferrari
+                - Fisker
+                - Ford
+                - GAZ
+                - GMC
+                - Geely
+                - Genesis
+                - Great Wall
+                - Hafei
+                - Haima
+                - Haval
+                - Honda
+                - Hummer
+                - Hyundai
+                - IZH
+                - Infiniti
+                - Iran Khodro
+                - Isuzu
+                - Iveco
+                - Jaguar
+                - Jeep
+                - KIA
+                - Karma
+                - LUAZ
+                - Lada
+                - Lamborghini
+                - Lancia
+                - Land Rover
+                - Lexus
+                - Lifan
+                - Lincoln
+                - Lotus
+                - Luxgen
+                - MG
+                - MINI
+                - Maserati
+                - Maxus
+                - Maybach
+                - Mazda
+                - McLaren
+                - Mercedes-Benz
+                - Mercury
+                - Mitsubishi
+                - Moskvitch
+                - Nissan
+                - Oldsmobile
+                - Opel
+                - Perodua
+                - Peugeot
+                - Pontiac
+                - Porsche
+                - Proton
+                - RAF
+                - Renault
+                - Rolls-Royce
+                - Rover
+                - SEAT
+                - Saab
+                - Saturn
+                - Scion
+                - SeAZ
+                - Skoda
+                - Smart
+                - SsangYong
+                - Subaru
+                - Suzuki
+                - TaGAZ
+                - Tatra
+                - Tesla
+                - Toyota
+                - UAZ
+                - VIS
+                - Vauxhall
+                - Volkswagen
+                - Volvo
+                - Wartburg
+                - Willys
+                - ZAZ
+                - ZIL
+                - ZX
+                - Zotye
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 256
+        height: 256
+      cmd: ""
+analytics:
+    - uuid: b23709c0-d3c1-4383-85dd-ead9355f18f9
+      name: Transport model recognition (classifier)
+      desc: Detects transport and recognizes car models.
+      enabled: true
+      framerate: 10
+      passhash: []
+      links:
+        colors-PP6zXN6hq:
+            "true":
+                - script-z61ZAae9E
+            "false": []
+        crop-lvaygi65:
+            "true":
+                - detector-lvausl4g
+            "false": []
+        detector-lvausl4g:
+            "true":
+                - filter-oj8ZeAkvb
+            "false": []
+        detector-lvc1uykv:
+            "true":
+                - script-lvc25ow4
+            "false": []
+        filter-oj8ZeAkvb:
+            "true":
+                - detector-lvc1uykv
+            "false": []
+        script-lvc1opll:
+            "true":
+                - result
+                - event-lvc1qzb2
+            "false": []
+        script-lvc25ow4:
+            "true":
+                - colors-PP6zXN6hq
+            "false": []
+        script-z61ZAae9E:
+            "true":
+                - script-lvc1opll
+            "false": []
+        source:
+            "true":
+                - crop-lvaygi65
+            "false": []
+      blocks:
+        colors-PP6zXN6hq:
+            id: colors-PP6zXN6hq
+            type: colors
+            data:
+                type: colors
+            position:
+                x: 900
+                "y": 100
+            active: true
+        crop-lvaygi65:
+            id: crop-lvaygi65
+            type: crop
+            data:
+                regionnames: []
+            position:
+                x: 240
+                "y": 100
+            active: true
+        detector-lvausl4g:
+            id: detector-lvausl4g
+            type: detector
+            data:
+                id: 35
+            position:
+                x: 460
+                "y": 100
+            uuid:
+                - 575e5cc0-8564-47c7-b777-f61ed7315883
+            active: true
+        detector-lvc1uykv:
+            id: detector-lvc1uykv
+            type: detector
+            data:
+                id: 38
+            position:
+                x: 880
+                "y": 320
+            uuid:
+                - 640d6f5d-5c02-469f-964b-17f81ab8b667
+            active: true
+        event-lvc1qzb2:
+            id: event-lvc1qzb2
+            type: event
+            data:
+                interval: "2"
+                saveframe: true
+            position:
+                x: 1500
+                "y": -120
+            active: true
+        filter-oj8ZeAkvb:
+            id: filter-oj8ZeAkvb
+            type: filter
+            data:
+                percentprob: "40"
+                type: filter
+                types:
+                    - car
+            position:
+                x: 680
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data:
+                type: result
+            position:
+                x: 1480
+                "y": 100
+            active: true
+        script-lvc1opll:
+            id: script-lvc1opll
+            type: script
+            data:
+                id: 40
+            position:
+                x: 1280
+                "y": -40
+            uuid:
+                - 4771e215-685e-4217-a3f9-0690944070f7
+            active: true
+        script-lvc25ow4:
+            id: script-lvc25ow4
+            type: script
+            data:
+                id: 41
+                values:
+                    minProb: "0.5"
+            position:
+                x: 1080
+                "y": 320
+            uuid:
+                - 5afb6609-1625-4371-bb4a-dc320dcc77c2
+            active: true
+        script-z61ZAae9E:
+            id: script-z61ZAae9E
+            type: script
+            data:
+                id: 38
+                type: script
+            position:
+                x: 1120
+                "y": 100
+            uuid:
+                - 7ea398e4-e3a2-434c-b15b-f421cdd71667
+            active: true
+        source:
+            id: source
+            type: source
+            data:
+                type: source
+            position:
+                x: 20
+                "y": 100
+            active: true

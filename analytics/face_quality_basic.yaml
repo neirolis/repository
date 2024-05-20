@@ -1,0 +1,236 @@
+uid: ""
+path: ""
+type: ""
+name: Face quality (basic)
+desc: Basic face quality classification
+version: v0.0.1
+detectors:
+    - uuid: 89bd4839-0b1f-4cf2-94ec-0085140a6fc1
+      name: fsx_p_cu111
+      enabled: true
+      type: faces
+      addrs:
+        - 127.0.0.1:53246
+      mode: ""
+      status:
+        version: 1.0.0
+        name: faces
+        type: detector
+        path: /cvpredict
+        variables:
+            - type: bool
+              name: items_response
+              label: ITEMS
+              desc: Items response format
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: nodetect
+              label: Without detection
+              desc: Do not use face detection analytic
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_pts
+              label: Keypoints
+              desc: Extract 5 face keypoints for face image
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_quality
+              label: Quality
+              desc: Call face quality analytics to detect poor image conditions
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_emotions
+              label: Expression
+              desc: Recognize emotion from facial expression
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_ang
+              label: Rotation
+              desc: Estimate face position on the image in terms of left-right and up-down angles
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
+            - type: bool
+              name: get_vect
+              label: Vector
+              desc: Extract person-unique vector for face recognition tasks
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: true
+              data: null
+              class: ""
+              width: 0
+              selected: false
+        output:
+            types:
+                - face
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: -1
+        height: -1
+      cmd: ""
+    - uuid: 86b4ead2-0a43-4e3d-95c8-3575e8723225
+      name: nrls_face-quality-classifier-tf2
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:65129
+      mode: ""
+      status:
+        version: 1.7.0
+        name: nrls_face-quality-classifier-tf2
+        type: classifier
+        path: /cvpredict
+        input:
+            - face
+        output:
+            types:
+                - fullface
+                - profile
+                - birdview
+                - backview
+                - facepart
+                - distractor
+                - trash
+                - empty
+                - blur
+                - scale
+                - overlap
+                - expression
+                - badlight
+            colors: []
+            attributes: []
+        image_types:
+            - ALL
+        width: 224
+        height: 224
+      cmd: ""
+analytics:
+    - uuid: 0e901609-fba6-4882-a9b1-bc5f1bffd7a3
+      name: Face quality (basic)
+      desc: Basic face quality classification
+      enabled: true
+      framerate: 3
+      passhash: []
+      links:
+        detector-lv6e0fws:
+            "true":
+                - filter-lv6e0hfy
+            "false": []
+        detector-lvc2qqbo:
+            "true":
+                - result
+            "false": []
+        filter-lv6e0hfy:
+            "true":
+                - detector-lvc2qqbo
+            "false": []
+        source:
+            "true":
+                - detector-lv6e0fws
+            "false": []
+      blocks:
+        detector-lv6e0fws:
+            id: detector-lv6e0fws
+            type: detector
+            data:
+                id: 34
+            position:
+                x: 240
+                "y": 100
+            uuid:
+                - 89bd4839-0b1f-4cf2-94ec-0085140a6fc1
+            active: true
+        detector-lvc2qqbo:
+            id: detector-lvc2qqbo
+            type: detector
+            data:
+                id: 39
+            position:
+                x: 680
+                "y": 100
+            uuid:
+                - 86b4ead2-0a43-4e3d-95c8-3575e8723225
+            active: true
+        filter-lv6e0hfy:
+            id: filter-lv6e0hfy
+            type: filter
+            data:
+                percentprob: "30"
+            position:
+                x: 460
+                "y": 100
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 900
+                "y": 100
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: 20
+                "y": 100
+            active: true

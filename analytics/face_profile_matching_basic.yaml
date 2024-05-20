@@ -1,17 +1,17 @@
 uid: ""
 path: ""
 type: ""
-name: profiles_faces
-desc: Check person profile, if there is one, then print person name. Else print "unknown".
+name: Face profile matching (basic)
+desc: Detect face and check if it matches any profile. If yes, create an event with found profile name, otherwise create fail event.
 version: v0.0.1
 scripts:
-    - uuid: 5782345d-4880-4a45-8978-a2538b9c6056
-      name: '!check_profile'
+    - uuid: 78a90398-a3f3-4b5a-ad0a-7dfee859f527
+      name: faceProfileMatching
       enabled: false
-      source: "// script created at 15:12:41 Sep 14\nfunction createEvent(frame, item) {\n  // var ntf = rtmip.Notification(\"S\")\n  frame.Status = item.Name\n  frame.Save()\n  var event = rtmip.NewProfileEvent(frame, item)\n  if (item.Name == \"unknown\")\n  event.State = \"fail\"\n  rtmip.StoreEvent(event)\n  // ntf.Send(event, frame.ImgDecoder)\n}\n\n\nfunction main(frame) {\n// \tvar startDay = new Date()\n// \tstartDay.setUTCHours(0,0,0,0)\n//   var timestamp = Math.round(startDay.getTime()/1000)\n  \n\tfor (var i in frame.Items) {\n\t  var item = frame.Items[i]\n\t  \n\t  if (item.Profile) {\n\t    createEvent(frame, item)\n  //     // var resp = rtmip.DB().LookupLastEvent(timestamp, {\"profile_id\": item.Profile.id })\n  //     // var err = resp[1]\n  //     // if (err) {\n  //     //   createEvent(frame, item)\n  //     // }\n    }\n    else {\n      item.Name = \"unknown\"\n      createEvent(frame, item)\n    }\n    \n    \n  }\n  return true\n}"
+      source: "// @public type:number default:15\nvar reportsPeriodSec = 15\n\n// @public type:number default:60\nvar cacheCleanupPeriod = 60\n\nvar globalCache = {}\n\nfunction getCache(cameraID) {\n    var camCache = globalCache[cameraID]\n    if (!camCache) {\n        camCache = {}\n        globalCache[cameraID] = {}\n    }\n    return camCache\n}\n\nfunction createEvent(frame, item) {\n    frame.Status = item.Name\n    frame.Save()\n    var event = rtmip.NewProfileEvent(frame, item)\n    event.State = item.State\n    rtmip.StoreEvent(event)\n}\n\n\nfunction main(frame) {\n\n    var camCache = getCache(frame.Camera.ID)\n\n    for (var i in frame.Items) {\n        var item = frame.Items[i]\n        var itemCache = camCache[item.ID]\n\n        if (!itemCache) {\n            itemCache = {}\n            itemCache[\"lastReport\"] = 0\n        }\n        \n        // if matching profile is not found, mark item as \"failed\" and assign \"unknown\" name\n        if (!item.Profile) {\n            item.Name = \"Unknown\"\n            item.State = \"fail\"\n        } else {\n            item.State = \"pass\"\n        }\n        \n        // limit reports for each item.ID to once in reportsPeriodSec\n        if (frame.Time - itemCache[\"lastReport\"] >= reportsPeriodSec) {\n            createEvent(frame, item)\n            itemCache[\"lastReport\"] = frame.Time\n        }\n        \n        camCache[item.ID] = itemCache\n    }\n\n    // remove inactive cached objects\n    for (var itemID in camCache) {\n        if (frame.Time - camCache[itemID][\"lastDetect\"] >= cacheCleanupPeriod) {\n            delete camCache[itemID]\n        }\n    }\n\n    return true\n}"
 detectors:
-    - uuid: 914c702a-fd97-4e34-961b-e98e33f935a5
-      name: nrls_face-server-x
+    - uuid: 89bd4839-0b1f-4cf2-94ec-0085140a6fc1
+      name: fsx_p_cu111
       enabled: true
       type: faces
       addrs:
@@ -23,6 +23,20 @@ detectors:
         type: detector
         path: /cvpredict
         variables:
+            - type: bool
+              name: items_response
+              label: ITEMS
+              desc: Items response format
+              readonly: false
+              required: false
+              unit: ""
+              system: false
+              value: null
+              default: false
+              data: null
+              class: ""
+              width: 0
+              selected: false
             - type: bool
               name: nodetect
               label: Without detection
@@ -107,20 +121,6 @@ detectors:
               class: ""
               width: 0
               selected: false
-            - type: bool
-              name: items_response
-              label: ITEMS
-              desc: Items response format
-              readonly: false
-              required: false
-              unit: ""
-              system: false
-              value: null
-              default: false
-              data: null
-              class: ""
-              width: 0
-              selected: false
         output:
             types:
                 - face
@@ -133,10 +133,10 @@ detectors:
       cmd: ""
 analytics:
     - uuid: e7dc1de5-c0ef-494b-91de-6d01a7f0e94f
-      name: profiles_faces
-      desc: Check person profile, if there is one, then print person name. Else print "unknown".
+      name: Face profile matching (basic)
+      desc: Detect face and check if it matches any profile. If yes, create an event with found profile name, otherwise create fail event.
       enabled: true
-      framerate: 5
+      framerate: 6
       passhash: []
       links:
         detector-r_Y2BBFgi:
@@ -168,13 +168,13 @@ analytics:
             id: detector-r_Y2BBFgi
             type: detector
             data:
-                id: 94
+                id: 34
                 type: detector
             position:
-                x: 190
+                x: 180
                 "y": 100
             uuid:
-                - 914c702a-fd97-4e34-961b-e98e33f935a5
+                - 89bd4839-0b1f-4cf2-94ec-0085140a6fc1
             active: true
         filter-0aPXpSJUF:
             id: filter-0aPXpSJUF
@@ -183,7 +183,7 @@ analytics:
                 percentprob: "50"
                 type: filter
             position:
-                x: 390
+                x: 400
                 "y": 100
             active: true
         profiles-osdScKhvb:
@@ -194,7 +194,7 @@ analytics:
                 type: profiles
             position:
                 x: 840
-                "y": -130
+                "y": 100
             active: true
         result:
             id: result
@@ -202,20 +202,22 @@ analytics:
             data:
                 type: result
             position:
-                x: 1500
-                "y": -40
+                x: 1280
+                "y": 100
             active: true
         script-VYKuzdw90:
             id: script-VYKuzdw90
             type: script
             data:
-                id: 155
+                id: 43
                 type: script
+                values:
+                    reportsPeriodSec: "15"
             position:
-                x: 1110
-                "y": -80
+                x: 1060
+                "y": 100
             uuid:
-                - 5782345d-4880-4a45-8978-a2538b9c6056
+                - 78a90398-a3f3-4b5a-ad0a-7dfee859f527
             active: true
         source:
             id: source
@@ -223,7 +225,7 @@ analytics:
             data:
                 type: source
             position:
-                x: 0
+                x: -40
                 "y": 100
             active: true
         tracking-5QfILnolG:
@@ -233,6 +235,6 @@ analytics:
                 scale: 2
                 type: tracking
             position:
-                x: 580
+                x: 620
                 "y": 100
             active: true
