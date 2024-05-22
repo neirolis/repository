@@ -46,8 +46,8 @@
 
 
 ### 5. Аналитика оружия:
-weapon_detection_basic
-- `.yaml`: Обнаружение оружия у человека.
+
+- `weapon_detection_basic.yaml`: Обнаружение оружия у человека.
 
 
 
