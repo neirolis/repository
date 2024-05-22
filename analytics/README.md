@@ -12,10 +12,11 @@
 ### 2. Аналитика движения и безопасности:
 
 - `fire_detection.yaml`: Обнаружение огня.
-- `license_plate_numbers.yaml`: Распознавание номеров автомобилей.
 - `mask_detection.yaml`: Определение наличия масок на лицах людей.
 - `motion_detection.yaml`: Обнаружение движения в кадре.
 - `no_helmet_detection.yaml`: Обнаружение людей без касок.
+- `social_distance.yaml`: Контроль соблюдения социальной дистанции между людьми.
+- `weapon_detection_basic.yaml`: Обнаружение оружия у человека.
 
 ### 3. Аналитика людей:
 
@@ -36,20 +37,12 @@
 
 ### 4. Аналитика транспорта:
 
-- `social_distance.yaml`: Контроль соблюдения социальной дистанции между людьми.
 - `transport_detection_basic.yaml`: Обнаружение транспортных средств в кадре.
 - `transport_model_recognition_classifier.yaml`: Распознавание типа транспортного средства.
 - `transport_model_recognition_plate_server.yaml`: Распознавание типа транспортного средства
 - `transport_parking.yaml`: Подсчет транспортных средств, на парковке.
 - `transport_quality_basic.yaml`: Оценка качества изображения транспортного средства.
 - `vehicle_cross_line.yaml`: Обнаружение транспортных средств, пересекающих линию.
-
-
-### 5. Аналитика оружия:
-
-- `weapon_detection_basic.yaml`: Обнаружение оружия у человека.
-
-
-
+- `license_plate_numbers.yaml`: Распознавание номеров автомобилей.
 
     
