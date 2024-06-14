@@ -1,0 +1,11 @@
+type: modules
+name: cameras-goipcam
+desc: Сlient for IP cameras using libavcodec
+version: v0.0.1
+author: sg3des
+
+source: https://rtmip.info/modules/cameras-goipcam.zip
+
+exec:
+  - mkdir -p $WD/cameras/goipcam/
+  - cp -f $PKGDIR/* $WD/cameras/goipcam/
