@@ -1,6 +1,6 @@
 name: nrls_person-parts-detector-torch
 desc: Detector of parts body person
-version: 1.2.9
+version: 1.2.10
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/person-parts-detector-torch.tar.gz
 auth: license, basic
 exec:
