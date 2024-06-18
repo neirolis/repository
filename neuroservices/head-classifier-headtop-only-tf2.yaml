@@ -1,6 +1,6 @@
 name: nrls_head-classifier-headtop-only-tf2
 desc: Head classifier (headtop, eyes) for personal protective gear
-version: 1.5.0
+version: 1.6.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/head-classifier-headtop-only-tf2.tar.gz
 auth: license, basic
 exec:
