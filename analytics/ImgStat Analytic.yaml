@@ -1,0 +1,130 @@
+uid: ""
+path: ""
+type: ""
+name: ImgStat Analytic
+version: v0.0.1
+desc: Checks image's blur, brightness and overexpose
+depends:
+  - imgstat-detector
+scripts:
+    - uuid: 6ff67fcb-b1c8-44ee-b9b7-6bf2c6a5269b
+      name: imgstat filter
+      enabled: false
+      source: |-
+        // script created at 13:41:09 Jul 04
+        //@public type:number default:30 desc:"Процент пикселей близких к белому свету. Большие значения означают засвет. 0-100%. Значение по умолчанию 30" label:"Overexpose percent"
+        var overexpose = 30
+
+        //@public type:number default:50 desc:"Средняя яркость изображения в процентах. Малые значения означают, что изображения слишком тёмные. 0-100%. Значение по умолчанию 50" label:"Brightness percent"
+        var brightness = 50
+
+        //@public type:number default:1000 desc:"Дисперсия значений пикселей. Если она меньше чем порог, то изображение считается размытым. Значение по умолчанию 1000" label:"Blur"
+        var blur = 1000
+
+
+        function main(frame) {
+        	
+        	var filtered = []
+        	
+        	for (var i in frame.Items) {
+        		var item = frame.Items[i]
+        		if (item.Type == "overexpose" && item.Prob > overexpose) {
+        	    filtered.push(item)
+        		}
+        		if (item.Type == "brightness" && item.Prob < brightness) {
+        	    filtered.push(item)
+        		}
+        		if (item.Type == "blur" && item.Prob < blur) {
+        	    filtered.push(item)
+        		}
+        	}
+        	
+        	frame.Items = filtered
+        	
+        	return true
+        }
+detectors:
+    - uuid: 9622ac57-f185-4987-a35f-4183f258a04d
+      name: imgstat
+      enabled: true
+      type: items
+      addrs:
+        - 127.0.0.1:9070
+      mode: ""
+      status:
+        version: 0.0.3
+        name: imgstat
+        type: detector
+        path: /
+        output:
+            types:
+                - overexpose
+                - brightness
+                - blur
+            colors: []
+            attributes: []
+      params:
+        threshold_blur: ""
+        threshold_brightness: ""
+        threshold_overexpose: ""
+        threshold_vlaplacian: "1000"
+      cmd: ./detectors/imgstat
+analytics:
+    - uuid: 3631f623-cf41-429c-91f4-9908aee45ccf
+      name: imgstat analytic
+      desc: Check image for overexpose, low brightness and high blur
+      enabled: true
+      framerate: 1
+      passhash: []
+      links:
+        detector-ly74ylg7:
+            "true":
+                - script-ly74yroz
+            "false": []
+        script-ly74yroz:
+            "true":
+                - result
+            "false": []
+        source:
+            "true":
+                - detector-ly74ylg7
+            "false": []
+      blocks:
+        detector-ly74ylg7:
+            id: detector-ly74ylg7
+            type: detector
+            data:
+                id: 15
+            position:
+                x: 260
+                "y": 100
+            uuid:
+                - 9622ac57-f185-4987-a35f-4183f258a04d
+            active: true
+        result:
+            id: result
+            type: result
+            data: {}
+            position:
+                x: 900
+                "y": 100
+            active: true
+        script-ly74yroz:
+            id: script-ly74yroz
+            type: script
+            data:
+                id: 9
+            position:
+                x: 560
+                "y": 100
+            uuid:
+                - 6ff67fcb-b1c8-44ee-b9b7-6bf2c6a5269b
+            active: true
+        source:
+            id: source
+            type: source
+            data: {}
+            position:
+                x: 0
+                "y": 100
+            active: true
