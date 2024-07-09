@@ -1,6 +1,6 @@
 name: nrls_rashmi-pipes-detector-torch
 desc: Detector for pipes in Rashmi factory
-version: 1.4.2
+version: 1.5.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/rashmi-pipes-detector-torch.tar.gz
 auth: license, basic
 exec:
