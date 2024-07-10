@@ -1,6 +1,6 @@
 name: nrls_plate-india-detector-torch
 desc: Detector of Indian license plates
-version: 1.4.1
+version: 1.5.0
 source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/plate-india-detector-torch.tar.gz
 auth: license, basic
 exec:
