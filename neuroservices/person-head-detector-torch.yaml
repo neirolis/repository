@@ -1,7 +1,7 @@
 name: nrls_person-head-detector-torch
 desc: Detector of people and heads
 version: 1.5.0
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/person-head-detector-torch.tar.gz
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls_neural_services/person-head-detector-torch.tar.gz
 auth: license, basic
 exec:
   - ./$PKGDIR/person-head-detector-torch/nrls_service_manager.sh --install --start
