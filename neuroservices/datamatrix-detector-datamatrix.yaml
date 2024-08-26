@@ -1,7 +1,7 @@
 name: nrls_datamatrix-detector-datamatrix
 desc: Detection and recognition of datamatrix codes
 version: 1.5.0
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/datamatrix-detector-datamatrix.tar.gz
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls_neural_services/datamatrix-detector-datamatrix.tar.gz
 auth: license, basic
 exec:
   - ./$PKGDIR/datamatrix-detector-datamatrix/nrls_service_manager.sh --install --start

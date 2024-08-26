@@ -1,6 +1,6 @@
 name: defocusing-detector
 desc: Detector of defocusing, overlapping and illumination of cameras
-version: v0.1.1
+version: v0.1.0
 source: https://rtmip.info/detectors/defocusing.zip
 exec:
   - mkdir -p $WD/detectors

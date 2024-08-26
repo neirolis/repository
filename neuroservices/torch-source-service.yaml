@@ -1,7 +1,7 @@
 name: nrls_torch-source
 desc: Source Pytorch service (withough weights and config)
 version: 0.0.2
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/torch-source-service.tar.gz
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls_neural_services/torch-source-service.tar.gz
 auth: license, basic
 exec:
   - mkdir -p /srv/nrls_neural_services/

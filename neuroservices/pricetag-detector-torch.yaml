@@ -1,7 +1,7 @@
 name: nrls_pricetag-detector-torch
 desc: Detector of product pricetags on retail store shelves
-version: 1.6.0
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/new/pricetag-detector-torch.tar.gz
+version: 1.5.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls_neural_services/pricetag-detector-torch.tar.gz
 auth: license, basic
 exec:
   - ./$PKGDIR/pricetag-detector-torch/nrls_service_manager.sh --install --start
