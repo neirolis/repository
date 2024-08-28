@@ -1,0 +1,17 @@
+name: nrls_pig-castratos-classifier-tf2
+desc: Pig castratos classifier -- classifier of pig dead bodies
+version: 1.2.1
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls_neural_services/pig-castratos-classifier-tf2.tar.gz
+auth: license, basic
+exec:
+  - ./$PKGDIR/pig-castratos-classifier-tf2/nrls_service_manager.sh --install --start
+
+exec_uninstall:
+  - /srv/nrls_neural_services/pig-castratos-classifier-tf2/nrls_service_manager.sh --stop
+  - /srv/nrls_neural_services/pig-castratos-classifier-tf2/nrls_service_manager.sh --uninstall
+
+detectors:
+  - name: nrls_pig-castratos-classifier-tf2
+    type: items
+    addrs: [127.0.0.1:65199]
+need_restart: false

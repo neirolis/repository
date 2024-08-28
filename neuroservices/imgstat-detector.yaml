@@ -1,0 +1,18 @@
+name: imgstat-detector
+desc: Detector of defocusing, blur and illumination of cameras
+version: v0.0.3
+source: https://rtmip.info/detectors/imgstat.zip
+exec:
+  - mkdir -p $WD/detectors
+  - mv $PKGDIR/imgstat $WD/detectors/imgstat
+
+exec_uninstall:
+  - pkill -9 imgstat
+  - rm ./detectors/imgstat
+
+detectors:
+  - name: imgstat
+    type: items
+    addrs: [127.0.0.1:9070]
+    cmd: ./detectors/imgstat
+

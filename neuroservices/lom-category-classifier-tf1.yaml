@@ -1,0 +1,12 @@
+name: nrls_lom-category-classifier-tf1
+desc: Classifier of scrap-metal
+version: 1.6.0
+source: hhttp://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls_neural_services/lom-category-classifier-tf1.tar.gz
+auth: license, basic
+exec:
+  - echo "Installed"
+
+exec_uninstall:
+  - echo "Uninstalled"
+
+need_restart: false
