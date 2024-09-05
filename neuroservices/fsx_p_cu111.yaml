@@ -1,7 +1,7 @@
 name: nrls_fsx_p_cu111
 desc: Face recoginition service. Cuda 11.1 tf 1.15 version
 version: 1.1
-source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls_fsx_p_cu111.zip
+source: http://ec2-108-128-165-217.eu-west-1.compute.amazonaws.com:25000/nrls/nrls_fsx_p_cu111.zip
 auth: license, basic
 exec:
   - ./$PKGDIR/install_and_start.sh
