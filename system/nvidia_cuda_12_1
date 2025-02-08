@@ -1,0 +1,9 @@
+name: nvidia_cuda_12_1
+desc: Install CUDA 12.1 and cudnn9. WARNING! ONLY MANUAL UNINSTALLATION!!! NO export for PATH and LD_LIBRARY_PATH do it manually!!!
+version: 0.99
+exec:
+  - ubuntuVersion="$(lsb_release -rs)"; if [ "$ubuntuVersion" = "20.04" ] || [ "$ubuntuVersion" = "22.04" ]; then echo "Compatible OS version"; exit 0; else echo "Incompatible OS version"; exit 1; fi
+  - apt install -y cuda-toolkit-12-1
+  - apt install -y libcudnn9-cuda-12=9.2.0.82-1
+  - apt install -y libcudnn9-dev-cuda-12=9.2.0.82-1
+need_restart: false
